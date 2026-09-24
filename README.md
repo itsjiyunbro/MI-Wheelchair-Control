@@ -104,3 +104,14 @@ The first implementation focuses on left and right steering. The system will lat
 ## License
 
 This project is released under the MIT License.
+
+## Unity implementation status
+
+The `unity` branch now contains the runnable Unity simulator, primitive wheelchair,
+indoor test course, dashboard HUD, Start/Stop/Reset, and TCP test senders.
+See [Unity setup, completed work, and temporary protocol](unity/README.md).
+
+Current integration uses **fake test predictions**, not the trained EEG model.
+The executable development protocol accepts LEFT / RIGHT / FORWARD / STOP;
+Hold/Rest and confidence-based decisions above remain future team plans.
+Open `unity/EEGWheelchairSimulator` in Unity Hub, then open `Assets/Scenes/MainScene.unity`.
