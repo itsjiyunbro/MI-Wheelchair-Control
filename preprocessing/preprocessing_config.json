@@ -1,0 +1,113 @@
+{
+  "dataset": "PhysioNet EEG Motor Movement/Imagery Dataset v1.0.0",
+  "dataset_root": "C:\\Users\\kimcy\\OneDrive\\바탕 화면\\융합캡스톤디자인\\eeg-motor-movementimagery-dataset-1.0.0\\files",
+  "subjects_total_original": 109,
+  "subjects_excluded": [
+    "S088",
+    "S089",
+    "S092",
+    "S100",
+    "S104",
+    "S106"
+  ],
+  "subjects_used": 103,
+  "runs": [
+    "04",
+    "08",
+    "12"
+  ],
+  "event_mapping": {
+    "T0": -1,
+    "T1": 0,
+    "T2": 1
+  },
+  "channels": [
+    "FC3",
+    "FCz",
+    "FC4",
+    "C3",
+    "Cz",
+    "C4",
+    "CP3",
+    "CPz",
+    "CP4"
+  ],
+  "sampling_rate_hz": 160,
+  "filter": {
+    "type": "Butterworth IIR",
+    "order": 2,
+    "low_hz": 8.0,
+    "high_hz": 30.0,
+    "phase": "forward",
+    "causal": true,
+    "notch_filter": false
+  },
+  "tapering": false,
+  "baseline_correction": false,
+  "window": {
+    "onset_start_sec": 0.5,
+    "onset_end_sec": 4.0,
+    "window_sec": 2.0,
+    "step_sec": 0.25,
+    "window_samples": 320,
+    "step_samples": 40,
+    "num_windows_per_trial": 7,
+    "expected_window_starts_sec": [
+      0.5,
+      0.75,
+      1.0,
+      1.25,
+      1.5,
+      1.75,
+      2.0
+    ]
+  },
+  "artifact": {
+    "ica": false,
+    "nan_or_inf": true,
+    "flat_channel": true,
+    "absolute_amplitude_threshold_uv": 100
+  },
+  "split": {
+    "method": "subject_level",
+    "train_ratio": 0.7,
+    "val_ratio": 0.15,
+    "test_ratio": 0.15,
+    "random_seed": 42
+  },
+  "standardization": {
+    "statistics_source": "TRAIN T1/T2 only",
+    "axis": "(windows, time) per channel",
+    "applied_to": [
+      "train T1/T2",
+      "val T1/T2",
+      "test T1/T2",
+      "train T0",
+      "val T0",
+      "test T0"
+    ]
+  },
+  "output_files": [
+    "X_train.npy",
+    "y_train.npy",
+    "X_val.npy",
+    "y_val.npy",
+    "X_test.npy",
+    "y_test.npy",
+    "X_rest_train.npy",
+    "X_rest_val.npy",
+    "X_rest_test.npy",
+    "X_train_unstd.npy",
+    "X_val_unstd.npy",
+    "X_test_unstd.npy",
+    "X_rest_train_unstd.npy",
+    "X_rest_val_unstd.npy",
+    "X_rest_test_unstd.npy",
+    "train_channel_mean.npy",
+    "train_channel_std.npy",
+    "split_subjects.csv",
+    "metadata_train.csv",
+    "metadata_val.csv",
+    "metadata_test.csv"
+  ]
+}
