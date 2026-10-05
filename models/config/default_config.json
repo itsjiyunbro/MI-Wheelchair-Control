@@ -1,0 +1,22 @@
+{
+  "data_dir": "../../preprocessing_folder/BCI_EEG_Preprocessed_Data_103Subjects",
+  "results_dir": "../results",
+  "checkpoints_dir": "../checkpoints",
+  "seed": 42,
+  "channels": 9,
+  "samples": 320,
+  "labels": {
+    "0": "Left",
+    "1": "Right"
+  },
+  "csp": {
+    "n_components": 4,
+    "reg": 1e-6
+  },
+  "eegnet": {
+    "batch_size": 64,
+    "epochs": 10,
+    "learning_rate": 0.001,
+    "dropout": 0.25
+  }
+}
