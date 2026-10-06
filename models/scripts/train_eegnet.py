@@ -1,4 +1,5 @@
 import argparse
+import csv
 import sys
 from pathlib import Path
 
@@ -63,12 +64,18 @@ def main(argv: list[str] | None = None) -> int:
     train_loader = DataLoader(train_ds, batch_size=batch_size, shuffle=True)
 
     best_val = -1.0
+    history = []
+    results_dir = Path(config["results_dir"])
+    results_dir.mkdir(parents=True, exist_ok=True)
+    history_path = results_dir / "eegnet_history.csv"
     checkpoint_dir = Path(config["checkpoints_dir"])
     checkpoint_dir.mkdir(parents=True, exist_ok=True)
     checkpoint_path = checkpoint_dir / "eegnet_best.pt"
 
     for epoch in range(1, epochs + 1):
         model.train()
+        total_loss = 0.0
+        total_seen = 0
         for xb, yb in train_loader:
             xb = xb.to(device)
             yb = yb.to(device)
@@ -76,18 +83,40 @@ def main(argv: list[str] | None = None) -> int:
             loss = loss_fn(model(xb), yb)
             loss.backward()
             optimizer.step()
+            total_loss += float(loss.item()) * len(yb)
+            total_seen += len(yb)
 
         val_metrics = _evaluate(model, X_val, y_val, device)
+        train_loss = total_loss / total_seen if total_seen else 0.0
+        history.append(
+            {
+                "epoch": epoch,
+                "train_loss": train_loss,
+                "val_accuracy": val_metrics["accuracy"],
+                "val_macro_f1": val_metrics["macro_f1"],
+            }
+        )
+        _save_history(history, history_path)
         print(f"epoch={epoch} val_accuracy={val_metrics['accuracy']:.4f} val_macro_f1={val_metrics['macro_f1']:.4f}")
         if val_metrics["macro_f1"] > best_val:
             best_val = val_metrics["macro_f1"]
             torch.save(model.state_dict(), checkpoint_path)
 
     test_metrics = _evaluate(model, X_test, y_test, device)
-    output = Path(config["results_dir"]) / "eegnet_metrics.json"
+    output = results_dir / "eegnet_metrics.json"
     save_json({"best_val_macro_f1": best_val, "test": test_metrics}, output)
     print(f"saved: {output}")
     return 0
+
+
+def _save_history(history: list[dict[str, float]], output: Path) -> None:
+    with output.open("w", newline="", encoding="utf-8") as f:
+        writer = csv.DictWriter(
+            f,
+            fieldnames=["epoch", "train_loss", "val_accuracy", "val_macro_f1"],
+        )
+        writer.writeheader()
+        writer.writerows(history)
 
 
 def _evaluate(model, X, y, device):
