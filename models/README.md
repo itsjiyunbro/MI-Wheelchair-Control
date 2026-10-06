@@ -10,7 +10,7 @@
 | --- | --- |
 | `config/` | 데이터 경로와 공통 실험 설정 |
 | `data/` | NumPy 전처리 배열 로더와 경로 설정 유틸리티 |
-| `csp_lda.py`, `eegnet.py`, `shallow_convnet.py` | CSP+LDA baseline, EEGNet, ShallowConvNet 구현 |
+| `csp_lda.py`, `svm_baseline.py`, `eegnet.py`, `shallow_convnet.py` | CSP+LDA, SVM baseline, EEGNet, ShallowConvNet 구현 |
 | `scripts/` | 데이터 확인, 학습, Rest false command 평가 실행 스크립트 |
 | `tests/` | 데이터 로더, 지표, baseline, EEGNet/ShallowConvNet smoke test |
 | `results/` | 학습/평가 결과 JSON 저장 위치 |
@@ -83,7 +83,7 @@ X_train_tensor_4d = torch.from_numpy(X_train[:, None])  # (N, 1, 9, 320)
 y_train_tensor = torch.from_numpy(y_train)
 ```
 
-CSP+LDA 실험에서는 우선 `X_train_unstd.npy`, `X_val_unstd.npy`, `X_test_unstd.npy`를 사용한다. CSP는 공간 필터 자체가 분산 구조를 사용하므로, 이미 z-score 표준화된 입력보다 표준화 전 filtered 신호가 더 해석하기 쉬울 수 있다.
+CSP+LDA와 SVM baseline 실험에서는 우선 `X_train_unstd.npy`, `X_val_unstd.npy`, `X_test_unstd.npy`를 사용한다. CSP는 공간 필터 자체가 분산 구조를 사용하고, 현재 SVM baseline은 channel별 log-variance feature를 사용하므로 표준화 전 filtered 신호가 더 해석하기 쉽다.
 
 ## 비교할 모델 후보
 
@@ -92,9 +92,9 @@ CSP+LDA 실험에서는 우선 `X_train_unstd.npy`, `X_val_unstd.npy`, `X_test_u
 | 모델 | 목적 |
 | --- | --- |
 | CSP+LDA | 고전적 MI EEG baseline. 딥러닝 모델 대비 기준 성능 확인용 |
+| SVM | 발표자료에 포함된 추가 baseline 후보 |
 | EEGNet | 경량 EEG CNN. 실시간 추론과 Unity 연동을 고려한 주 후보 |
 | ShallowConvNet | EEG 시계열 CNN 비교 모델 |
-| SVM | 발표자료에 포함된 추가 baseline 후보 |
 | CNN-LSTM | 발표자료에 포함된 시계열 딥러닝 후보 |
 
 우선순위는 `CSP+LDA -> EEGNet -> ShallowConvNet`으로 두는 것이 좋다. 시간이 허용되면 SVM, CNN-LSTM을 추가 비교한다.
@@ -117,15 +117,16 @@ Rest false command 평가는 T1/T2 이진 분류 모델 학습 이후 별도로 
 
 ## 현재 실험 결과 요약
 
-현재까지는 동일한 103명 subject split에서 CSP+LDA, EEGNet, ShallowConvNet을 비교했다.
+현재까지는 동일한 103명 subject split에서 CSP+LDA, SVM, EEGNet, ShallowConvNet을 비교했다.
 
 | 모델 | 학습/실행 위치 | Test accuracy | Test macro F1 | Test Rest false command @0.9 | 비고 |
 | --- | --- | ---: | ---: | ---: | --- |
 | CSP+LDA | 로컬 | 0.5589 | 0.5589 | 미평가 | 가장 빠른 baseline |
+| SVM | 로컬 | 0.5034 | 0.4758 | 미평가 | channel log-variance 기반 linear SVM baseline |
 | EEGNet | Colab GPU | 0.5920 | 0.5893 | 0.0562 (202/3596) | Left/Right 분류 성능이 현재 최고 |
 | ShallowConvNet | Colab GPU | 0.5792 | 0.5763 | 0.0231 (83/3596) | Rest false command가 EEGNet보다 낮음 |
 
-현재 결과만 보면 Left/Right 분류 성능은 EEGNet이 가장 높고, Rest/T0에서 불필요한 명령을 줄이는 관점은 ShallowConvNet이 더 안정적이다. 최종 모델 선택은 validation Rest threshold와 test 성능을 함께 보고 결정한다.
+현재 결과만 보면 Left/Right 분류 성능은 EEGNet이 가장 높고, Rest/T0에서 불필요한 명령을 줄이는 관점은 ShallowConvNet이 더 안정적이다. SVM은 CSP+LDA보다 낮아 현재 주 후보는 아니다. 최종 모델 선택은 validation Rest threshold와 test 성능을 함께 보고 결정한다.
 
 ## 권장 작업 순서
 
@@ -195,6 +196,12 @@ CSP+LDA baseline:
 
 ```bash
 python models/scripts/train_csp_lda.py --config models/config/default_config.json
+```
+
+SVM baseline:
+
+```bash
+python models/scripts/train_svm.py --config models/config/default_config.json
 ```
 
 EEGNet 학습:
