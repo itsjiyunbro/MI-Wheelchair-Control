@@ -6,8 +6,8 @@ from pathlib import Path
 if __package__ in (None, ""):
     sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
+from models.architectures.csp_lda import fit_csp_lda
 from models.data.eeg_dataset import apply_path_overrides, load_config, load_split
-from models.csp_lda import fit_csp_lda
 from models.utils.metrics import classification_metrics, save_json
 
 
