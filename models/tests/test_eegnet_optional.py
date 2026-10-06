@@ -6,7 +6,10 @@ from pathlib import Path
 import numpy as np
 
 from models.eegnet import create_eegnet
-from models.scripts.evaluate_rest import false_command_rate
+from models.scripts.evaluate_rest import (
+    false_command_rate,
+    summarize_false_command_rates,
+)
 from models.scripts.train_eegnet import main as train_eegnet_main
 
 
@@ -56,6 +59,39 @@ class EegNetOptionalTest(unittest.TestCase):
         rate = false_command_rate(probabilities, threshold=0.9)
 
         self.assertEqual(rate, 1 / 3)
+
+    def test_summarize_false_command_rates_reports_counts_per_threshold(self):
+        probabilities = np.array(
+            [
+                [0.51, 0.49],
+                [0.80, 0.20],
+                [0.10, 0.90],
+            ]
+        )
+
+        summary = summarize_false_command_rates(probabilities, thresholds=[0.5, 0.85])
+
+        self.assertEqual(
+            summary,
+            [
+                {
+                    "threshold": 0.5,
+                    "false_command_count": 3,
+                    "predicted_0_count": 2,
+                    "predicted_1_count": 1,
+                    "total": 3,
+                    "false_command_rate": 1.0,
+                },
+                {
+                    "threshold": 0.85,
+                    "false_command_count": 1,
+                    "predicted_0_count": 0,
+                    "predicted_1_count": 1,
+                    "total": 3,
+                    "false_command_rate": 1 / 3,
+                },
+            ],
+        )
 
     def test_train_eegnet_writes_epoch_history_csv(self):
         try:
