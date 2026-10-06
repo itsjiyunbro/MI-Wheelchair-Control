@@ -5,7 +5,7 @@ from pathlib import Path
 
 import numpy as np
 
-from models.eegnet import create_eegnet
+from models.architectures.eegnet import create_eegnet
 from models.scripts.evaluate_rest import (
     false_command_rate,
     model_prefix,
