@@ -5,7 +5,7 @@ from pathlib import Path
 
 import numpy as np
 
-from models.shallow_convnet import create_shallow_convnet
+from models.architectures.shallow_convnet import create_shallow_convnet
 from models.scripts.train_shallow_convnet import main as train_shallow_convnet_main
 
 
