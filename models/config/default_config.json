@@ -18,5 +18,15 @@
     "epochs": 10,
     "learning_rate": 0.001,
     "dropout": 0.25
+  },
+  "shallow_convnet": {
+    "batch_size": 64,
+    "epochs": 50,
+    "learning_rate": 0.001,
+    "dropout": 0.5,
+    "filters": 40,
+    "temporal_kernel": 25,
+    "pool_size": 75,
+    "pool_stride": 15
   }
 }
