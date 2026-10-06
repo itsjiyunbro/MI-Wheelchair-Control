@@ -6,8 +6,8 @@ from pathlib import Path
 if __package__ in (None, ""):
     sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
+from models.architectures.svm_baseline import fit_svm_baseline
 from models.data.eeg_dataset import apply_path_overrides, load_config, load_split
-from models.svm_baseline import fit_svm_baseline
 from models.utils.metrics import classification_metrics, save_json
 
 
