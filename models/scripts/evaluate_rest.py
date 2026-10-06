@@ -14,6 +14,7 @@ from models.data.eeg_dataset import (
     load_rest,
 )
 from models.eegnet import create_eegnet
+from models.shallow_convnet import create_shallow_convnet
 from models.utils.metrics import save_json
 
 
@@ -50,12 +51,33 @@ def summarize_false_command_rates(probabilities, thresholds):
     return summary
 
 
+def model_prefix(model_name: str) -> str:
+    if model_name not in {"eegnet", "shallow_convnet"}:
+        raise ValueError(f"unsupported model: {model_name}")
+    return model_name
+
+
+def create_model(model_name: str, config: dict):
+    prefix = model_prefix(model_name)
+    if prefix == "eegnet":
+        return create_eegnet(dropout=float(config.get("eegnet", {}).get("dropout", 0.25)))
+    model_config = config.get("shallow_convnet", {})
+    return create_shallow_convnet(
+        dropout=float(model_config.get("dropout", 0.5)),
+        filters=int(model_config.get("filters", 40)),
+        temporal_kernel=int(model_config.get("temporal_kernel", 25)),
+        pool_size=int(model_config.get("pool_size", 75)),
+        pool_stride=int(model_config.get("pool_stride", 15)),
+    )
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Evaluate Rest/T0 false command rate.")
+    parser.add_argument("--model", choices=["eegnet", "shallow_convnet"], default="eegnet")
     parser.add_argument("--config", default="models/config/default_config.json")
     parser.add_argument("--data-dir", default=None, help="Override preprocessed data directory.")
     parser.add_argument("--results-dir", default=None, help="Override results directory.")
-    parser.add_argument("--checkpoint", default=None, help="EEGNet checkpoint path.")
+    parser.add_argument("--checkpoint", default=None, help="PyTorch model checkpoint path.")
     parser.add_argument("--probabilities", default=None, help="Path to N x 2 probability .npy file.")
     parser.add_argument("--threshold", type=float, default=0.9)
     parser.add_argument("--thresholds", default="0.5,0.6,0.7,0.8,0.9")
@@ -77,7 +99,7 @@ def main(argv: list[str] | None = None) -> int:
     try:
         import torch
     except ImportError:
-        print("PyTorch is required for EEGNet Rest/T0 evaluation. Use Colab GPU or install torch.")
+        print("PyTorch is required for Rest/T0 evaluation. Use Colab GPU or install torch.")
         return 2
 
     config = apply_path_overrides(
@@ -90,7 +112,8 @@ def main(argv: list[str] | None = None) -> int:
     results_dir.mkdir(parents=True, exist_ok=True)
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    model = create_eegnet(dropout=float(config.get("eegnet", {}).get("dropout", 0.25))).to(device)
+    prefix = model_prefix(args.model)
+    model = create_model(prefix, config).to(device)
     state = _load_state_dict(torch, args.checkpoint, device)
     model.load_state_dict(state)
     model.eval()
@@ -101,7 +124,7 @@ def main(argv: list[str] | None = None) -> int:
     for split in ("train", "val", "test"):
         X_rest = load_rest(config["data_dir"], split, mmap=True)
         probabilities = _predict_probabilities(torch, model, X_rest, device, args.batch_size)
-        probability_path = results_dir / f"eegnet_rest_{split}_probabilities.npy"
+        probability_path = results_dir / f"{prefix}_rest_{split}_probabilities.npy"
         np.save(probability_path, probabilities)
         probability_paths[split] = str(probability_path)
 
@@ -112,8 +135,8 @@ def main(argv: list[str] | None = None) -> int:
             all_rows.append(output_row)
             print(_format_row(split, row))
 
-    csv_path = results_dir / "eegnet_rest_false_command.csv"
-    json_path = results_dir / "eegnet_rest_false_command.json"
+    csv_path = results_dir / f"{prefix}_rest_false_command.csv"
+    json_path = results_dir / f"{prefix}_rest_false_command.json"
     _save_csv(all_rows, csv_path)
     save_json(
         {
