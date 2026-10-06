@@ -1,9 +1,23 @@
+import json
+import shutil
 import unittest
+from pathlib import Path
 
 import numpy as np
 
 from models.eegnet import create_eegnet
 from models.scripts.evaluate_rest import false_command_rate
+from models.scripts.train_eegnet import main as train_eegnet_main
+
+
+TMP_ROOT = Path(__file__).resolve().parents[2] / ".test_tmp"
+
+
+def fresh_case_dir(name: str) -> Path:
+    path = TMP_ROOT / name
+    shutil.rmtree(path, ignore_errors=True)
+    path.mkdir(parents=True, exist_ok=True)
+    return path
 
 
 class EegNetOptionalTest(unittest.TestCase):
@@ -42,6 +56,54 @@ class EegNetOptionalTest(unittest.TestCase):
         rate = false_command_rate(probabilities, threshold=0.9)
 
         self.assertEqual(rate, 1 / 3)
+
+    def test_train_eegnet_writes_epoch_history_csv(self):
+        try:
+            import torch  # noqa: F401
+        except ImportError:
+            self.skipTest("PyTorch is not installed in this Python environment.")
+
+        root = fresh_case_dir("eegnet_history")
+        data_dir = root / "data"
+        data_dir.mkdir(exist_ok=True)
+        results_dir = root / "results"
+        checkpoints_dir = root / "checkpoints"
+
+        rng = np.random.default_rng(42)
+        for split in ("train", "val", "test"):
+            X = rng.normal(0, 0.01, size=(4, 9, 320)).astype(np.float32)
+            X[:2, 0] += 0.5
+            X[2:, 1] += 0.5
+            y = np.array([0, 0, 1, 1], dtype=np.int64)
+            np.save(data_dir / f"X_{split}.npy", X)
+            np.save(data_dir / f"y_{split}.npy", y)
+
+        config_path = root / "config.json"
+        config_path.write_text(
+            json.dumps(
+                {
+                    "data_dir": str(data_dir),
+                    "results_dir": str(results_dir),
+                    "checkpoints_dir": str(checkpoints_dir),
+                    "eegnet": {
+                        "batch_size": 2,
+                        "epochs": 1,
+                        "learning_rate": 0.001,
+                        "dropout": 0.25,
+                    },
+                }
+            ),
+            encoding="utf-8",
+        )
+
+        code = train_eegnet_main(["--config", str(config_path), "--epochs", "1"])
+
+        history_path = results_dir / "eegnet_history.csv"
+        self.assertEqual(code, 0)
+        self.assertTrue(history_path.exists())
+        lines = history_path.read_text(encoding="utf-8").splitlines()
+        self.assertEqual(lines[0], "epoch,train_loss,val_accuracy,val_macro_f1")
+        self.assertEqual(len(lines), 2)
 
 
 if __name__ == "__main__":
