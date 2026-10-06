@@ -10,9 +10,9 @@
 | --- | --- |
 | `config/` | 데이터 경로와 공통 실험 설정 |
 | `data/` | NumPy 전처리 배열 로더와 경로 설정 유틸리티 |
-| `csp_lda.py`, `eegnet.py` | CSP+LDA baseline, EEGNet 구현 |
+| `csp_lda.py`, `eegnet.py`, `shallow_convnet.py` | CSP+LDA baseline, EEGNet, ShallowConvNet 구현 |
 | `scripts/` | 데이터 확인, 학습, Rest false command 평가 실행 스크립트 |
-| `tests/` | 데이터 로더, 지표, baseline, EEGNet smoke test |
+| `tests/` | 데이터 로더, 지표, baseline, EEGNet/ShallowConvNet smoke test |
 | `results/` | 학습/평가 결과 JSON 저장 위치 |
 | `checkpoints/` | PyTorch 모델 checkpoint 저장 위치 |
 | `README.md` | 본 문서 |
@@ -115,6 +115,18 @@ CSP+LDA 실험에서는 우선 `X_train_unstd.npy`, `X_val_unstd.npy`, `X_test_u
 
 Rest false command 평가는 T1/T2 이진 분류 모델 학습 이후 별도로 수행한다. `X_rest_val.npy`는 confidence threshold를 정하는 데 사용하고, `X_rest_test.npy`는 정해진 threshold에서 실제 false command rate를 보고하는 데 사용한다.
 
+## 현재 실험 결과 요약
+
+현재까지는 동일한 103명 subject split에서 CSP+LDA, EEGNet, ShallowConvNet을 비교했다.
+
+| 모델 | 학습/실행 위치 | Test accuracy | Test macro F1 | Test Rest false command @0.9 | 비고 |
+| --- | --- | ---: | ---: | ---: | --- |
+| CSP+LDA | 로컬 | 0.5589 | 0.5589 | 미평가 | 가장 빠른 baseline |
+| EEGNet | Colab GPU | 0.5920 | 0.5893 | 0.0562 (202/3596) | Left/Right 분류 성능이 현재 최고 |
+| ShallowConvNet | Colab GPU | 0.5792 | 0.5763 | 0.0231 (83/3596) | Rest false command가 EEGNet보다 낮음 |
+
+현재 결과만 보면 Left/Right 분류 성능은 EEGNet이 가장 높고, Rest/T0에서 불필요한 명령을 줄이는 관점은 ShallowConvNet이 더 안정적이다. 최종 모델 선택은 validation Rest threshold와 test 성능을 함께 보고 결정한다.
+
 ## 권장 작업 순서
 
 1. `config/`에 데이터 경로와 공통 설정을 저장한다.
@@ -191,18 +203,39 @@ EEGNet 학습:
 python models/scripts/train_eegnet.py --config models/config/default_config.json --epochs 50
 ```
 
-Rest false command 평가:
+ShallowConvNet 학습:
 
 ```bash
-python models/scripts/evaluate_rest.py --probabilities models/results/rest_test_probabilities.npy --threshold 0.9
+python models/scripts/train_shallow_convnet.py --config models/config/default_config.json --epochs 50
 ```
 
-현재 Rest 평가는 `N x 2` 확률 배열(`.npy`)을 입력으로 받아 confidence threshold 이상으로 Left/Right 명령이 발생하는 비율을 계산하는 보조 스크립트이다. EEGNet에서 Rest 확률 저장까지 연결하는 단계는 이후 확장 작업으로 둔다.
+EEGNet Rest false command 평가:
+
+```bash
+python models/scripts/evaluate_rest.py --model eegnet --config models/config/default_config.json --checkpoint models/checkpoints/eegnet_best.pt
+```
+
+ShallowConvNet Rest false command 평가:
+
+```bash
+python models/scripts/evaluate_rest.py --model shallow_convnet --config models/config/default_config.json --checkpoint models/checkpoints/shallow_convnet_best.pt
+```
 
 Colab이나 Google Drive 경로가 기본 `data/` 위치와 다르면 코드 수정 대신 다음 옵션으로 경로만 바꾼다.
 
 ```bash
 python models/scripts/train_eegnet.py \
+  --config models/config/default_config.json \
+  --data-dir /content/drive/MyDrive/path/to/BCI_EEG_Preprocessed_Data_103Subjects \
+  --results-dir /content/drive/MyDrive/path/to/results \
+  --checkpoints-dir /content/drive/MyDrive/path/to/checkpoints \
+  --epochs 50
+```
+
+ShallowConvNet도 같은 방식으로 실행한다.
+
+```bash
+python models/scripts/train_shallow_convnet.py \
   --config models/config/default_config.json \
   --data-dir /content/drive/MyDrive/path/to/BCI_EEG_Preprocessed_Data_103Subjects \
   --results-dir /content/drive/MyDrive/path/to/results \
