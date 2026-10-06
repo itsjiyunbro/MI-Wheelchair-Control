@@ -8,3 +8,6 @@ Planned contents include:
 - system architecture
 - references and paper summaries
 - evaluation results
+
+Current notes:
+- [Unity prototype status](unity_prototype_status.md)

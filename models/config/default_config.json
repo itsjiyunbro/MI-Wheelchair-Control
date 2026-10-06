@@ -1,5 +1,5 @@
 {
-  "data_dir": "../../preprocessing_folder/BCI_EEG_Preprocessed_Data_103Subjects",
+  "data_dir": "../../data/BCI_EEG_Preprocessed_Data_103Subjects",
   "results_dir": "../results",
   "checkpoints_dir": "../checkpoints",
   "seed": 42,

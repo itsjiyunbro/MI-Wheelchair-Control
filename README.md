@@ -37,6 +37,14 @@ Virtual wheelchair control
 - T2: Right-hand motor imagery
 - T0: Rest
 
+Large EDF, NumPy, checkpoint, and result files are not stored in this repository. By default, model scripts expect preprocessed arrays under:
+
+```text
+data/BCI_EEG_Preprocessed_Data_103Subjects/
+```
+
+If the arrays are stored elsewhere, set `MI_WHEELCHAIR_DATA_DIR` or pass `--data-dir` to the model scripts.
+
 ## Current Preprocessing Plan
 
 Selected sensorimotor channels:
@@ -83,10 +91,17 @@ The target inference setup is:
 - Causal preprocessing
 - Python inference result sent to Unity 3D
 
+## Unity Prototype Status
+
+A Unity draft scene has been reviewed from the local project materials. The current prototype is an `EEGWheelchairSimulator` scene running in Unity 6.3 LTS with a simple virtual wheelchair object, a ground/road environment, keyboard control mode, and an on-screen status panel.
+
+The status panel already exposes the fields needed for the BCI demo flow: simulation state, control mode, movement state, steering direction, heading, Python connection status, model prediction, confidence, and start/stop/reset controls. The next Unity step is to place the actual Unity project files under `unity/` and connect these UI fields to Python inference messages.
+
 ## Repository Structure
 
 ```text
 MI-Wheelchair-Control/
+├── data/             # Local-only preprocessed arrays, ignored by Git
 ├── preprocessing/   # EEG loading, filtering, windowing, dataset preparation
 ├── models/          # CSP+LDA, EEGNet, ShallowConvNet and model experiments
 ├── realtime/        # EEG stream simulation and online inference

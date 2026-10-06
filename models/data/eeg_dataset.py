@@ -1,15 +1,34 @@
 import json
+import os
 from pathlib import Path
 from typing import Any
 
 import numpy as np
 
 
+PATH_ENV_VARS = {
+    "data_dir": "MI_WHEELCHAIR_DATA_DIR",
+    "results_dir": "MI_WHEELCHAIR_RESULTS_DIR",
+    "checkpoints_dir": "MI_WHEELCHAIR_CHECKPOINTS_DIR",
+}
+
+
+def _expand_path(value: str) -> Path:
+    return Path(os.path.expandvars(value)).expanduser()
+
+
 def _resolve(base: Path, value: str) -> str:
-    path = Path(value)
+    path = _expand_path(value)
     if path.is_absolute():
         return str(path)
     return str((base / path).resolve())
+
+
+def _resolve_override(value: str) -> str:
+    path = _expand_path(value)
+    if path.is_absolute():
+        return str(path)
+    return str(path.resolve())
 
 
 def load_config(config_path: str | Path) -> dict[str, Any]:
@@ -35,8 +54,10 @@ def apply_path_overrides(
         ("results_dir", results_dir),
         ("checkpoints_dir", checkpoints_dir),
     ):
-        if value is not None:
-            updated[key] = value
+        if value is None:
+            value = os.environ.get(PATH_ENV_VARS[key])
+        if value:
+            updated[key] = _resolve_override(value)
     return updated
 
 

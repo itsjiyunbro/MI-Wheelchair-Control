@@ -1,6 +1,8 @@
 import json
+import os
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 import numpy as np
 
@@ -58,10 +60,39 @@ class DataAndMetricsTest(unittest.TestCase):
             checkpoints_dir="drive_checkpoints",
         )
 
-        self.assertEqual(updated["data_dir"], "drive_data")
+        self.assertEqual(Path(updated["data_dir"]), Path("drive_data").resolve())
         self.assertEqual(updated["results_dir"], "original_results")
-        self.assertEqual(updated["checkpoints_dir"], "drive_checkpoints")
+        self.assertEqual(Path(updated["checkpoints_dir"]), Path("drive_checkpoints").resolve())
         self.assertEqual(config["data_dir"], "original_data")
+
+    def test_apply_path_overrides_uses_environment_when_cli_is_omitted(self):
+        config = {
+            "data_dir": "original_data",
+            "results_dir": "original_results",
+            "checkpoints_dir": "original_checkpoints",
+        }
+
+        with patch.dict(
+            os.environ,
+            {
+                "MI_WHEELCHAIR_DATA_DIR": "env_data",
+                "MI_WHEELCHAIR_RESULTS_DIR": "env_results",
+            },
+            clear=False,
+        ):
+            updated = apply_path_overrides(config)
+
+        self.assertEqual(Path(updated["data_dir"]), Path("env_data").resolve())
+        self.assertEqual(Path(updated["results_dir"]), Path("env_results").resolve())
+        self.assertEqual(updated["checkpoints_dir"], "original_checkpoints")
+
+    def test_cli_path_override_wins_over_environment(self):
+        config = {"data_dir": "original_data"}
+
+        with patch.dict(os.environ, {"MI_WHEELCHAIR_DATA_DIR": "env_data"}, clear=False):
+            updated = apply_path_overrides(config, data_dir="cli_data")
+
+        self.assertEqual(Path(updated["data_dir"]), Path("cli_data").resolve())
 
     def test_load_split_and_rest_validate_expected_arrays(self):
         data_dir = case_dir("arrays")

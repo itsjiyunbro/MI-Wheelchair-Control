@@ -19,10 +19,23 @@
 
 ## 사용할 전처리 산출물
 
-기본 입력 데이터 위치:
+기본 설정은 저장소 루트의 `data/BCI_EEG_Preprocessed_Data_103Subjects`를 전처리 산출물 위치로 사용한다.
 
 ```text
-C:\Users\bjy99\OneDrive\문서\2026_4\융합캡스톤디자인\codex\preprocessing_folder\BCI_EEG_Preprocessed_Data_103Subjects
+MI-Wheelchair-Control/
+└── data/
+    └── BCI_EEG_Preprocessed_Data_103Subjects/
+```
+
+`data/`는 Git에 올리지 않는 로컬 데이터 폴더이다. 다른 위치에 산출물을 둔 경우에는 코드 수정 없이 `--data-dir` 인자나 `MI_WHEELCHAIR_DATA_DIR` 환경변수로 지정한다.
+
+```bash
+python models/scripts/check_data.py --data-dir path/to/BCI_EEG_Preprocessed_Data_103Subjects
+```
+
+```powershell
+$env:MI_WHEELCHAIR_DATA_DIR = "path\to\BCI_EEG_Preprocessed_Data_103Subjects"
+python models/scripts/check_data.py
 ```
 
 핵심 파일:
@@ -57,11 +70,12 @@ PyTorch 모델 예시:
 ```python
 import numpy as np
 import torch
+from pathlib import Path
 
-data_dir = r"C:\Users\bjy99\OneDrive\문서\2026_4\융합캡스톤디자인\codex\preprocessing_folder\BCI_EEG_Preprocessed_Data_103Subjects"
+data_dir = Path("data/BCI_EEG_Preprocessed_Data_103Subjects")
 
-X_train = np.load(data_dir + r"\X_train.npy").astype("float32")
-y_train = np.load(data_dir + r"\y_train.npy").astype("int64")
+X_train = np.load(data_dir / "X_train.npy").astype("float32")
+y_train = np.load(data_dir / "y_train.npy").astype("int64")
 
 # 모델 구현에 따라 다음 둘 중 하나를 선택한다.
 X_train_tensor = torch.from_numpy(X_train)              # (N, 9, 320)
@@ -131,7 +145,7 @@ Rest false command 평가는 T1/T2 이진 분류 모델 학습 이후 별도로 
 python models/scripts/check_data.py --config models/config/default_config.json
 ```
 
-현재 로컬 기준 예상 출력의 핵심은 다음과 같다.
+현재 산출물 기준 예상 출력의 핵심은 다음과 같다.
 
 ```text
 train: X=(18096, 9, 320), y={0: 9216, 1: 8880}
@@ -147,16 +161,17 @@ rest_test: X=(3596, 9, 320)
 ```python
 import numpy as np
 from collections import Counter
+from pathlib import Path
 
-data_dir = r"C:\Users\bjy99\OneDrive\문서\2026_4\융합캡스톤디자인\codex\preprocessing_folder\BCI_EEG_Preprocessed_Data_103Subjects"
+data_dir = Path("data/BCI_EEG_Preprocessed_Data_103Subjects")
 
 for split in ["train", "val", "test"]:
-    X = np.load(data_dir + fr"\X_{split}.npy", mmap_mode="r")
-    y = np.load(data_dir + fr"\y_{split}.npy")
+    X = np.load(data_dir / f"X_{split}.npy", mmap_mode="r")
+    y = np.load(data_dir / f"y_{split}.npy")
     print(split, X.shape, X.dtype, Counter(y.tolist()))
 
 for split in ["train", "val", "test"]:
-    X_rest = np.load(data_dir + fr"\X_rest_{split}.npy", mmap_mode="r")
+    X_rest = np.load(data_dir / f"X_rest_{split}.npy", mmap_mode="r")
     print("rest", split, X_rest.shape, X_rest.dtype)
 ```
 
@@ -184,7 +199,7 @@ python models/scripts/evaluate_rest.py --probabilities models/results/rest_test_
 
 현재 Rest 평가는 `N x 2` 확률 배열(`.npy`)을 입력으로 받아 confidence threshold 이상으로 Left/Right 명령이 발생하는 비율을 계산하는 보조 스크립트이다. EEGNet에서 Rest 확률 저장까지 연결하는 단계는 이후 확장 작업으로 둔다.
 
-로컬 PC에는 GPU가 없으므로 EEGNet 장시간 학습은 GitHub에 push한 뒤 Colab GPU에서 실행한다. Colab이나 Google Drive 경로가 로컬과 다르면 코드 수정 대신 다음 옵션으로 경로만 바꾼다.
+Colab이나 Google Drive 경로가 기본 `data/` 위치와 다르면 코드 수정 대신 다음 옵션으로 경로만 바꾼다.
 
 ```bash
 python models/scripts/train_eegnet.py \

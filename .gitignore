@@ -1,0 +1,14 @@
+# Local datasets and generated preprocessing outputs
+/data/
+/preprocessing_folder/
+/processed_EEG_103subjects_final/
+
+# Model outputs
+models/results/
+models/checkpoints/
+models/.test_tmp/
+/.test_tmp/
+
+# Python cache
+__pycache__/
+*.pyc
