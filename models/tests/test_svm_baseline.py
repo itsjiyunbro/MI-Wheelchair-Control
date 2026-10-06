@@ -5,7 +5,7 @@ from pathlib import Path
 
 import numpy as np
 
-from models.svm_baseline import fit_svm_baseline
+from models.architectures.svm_baseline import fit_svm_baseline
 from models.scripts.train_svm import main as train_svm_main
 
 
