@@ -10,7 +10,7 @@
 | --- | --- |
 | `config/` | 데이터 경로와 공통 실험 설정 |
 | `data/` | NumPy 전처리 배열 로더와 경로 설정 유틸리티 |
-| `csp_lda.py`, `svm_baseline.py`, `eegnet.py`, `shallow_convnet.py` | CSP+LDA, SVM baseline, EEGNet, ShallowConvNet 구현 |
+| `architectures/` | CSP+LDA, SVM baseline, EEGNet, ShallowConvNet 모델 구현 |
 | `scripts/` | 데이터 확인, 학습, Rest false command 평가 실행 스크립트 |
 | `tests/` | 데이터 로더, 지표, baseline, EEGNet/ShallowConvNet smoke test |
 | `results/` | 학습/평가 결과 JSON 저장 위치 |
