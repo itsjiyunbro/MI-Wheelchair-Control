@@ -8,6 +8,7 @@ import numpy as np
 from models.eegnet import create_eegnet
 from models.scripts.evaluate_rest import (
     false_command_rate,
+    model_prefix,
     summarize_false_command_rates,
 )
 from models.scripts.train_eegnet import main as train_eegnet_main
@@ -92,6 +93,12 @@ class EegNetOptionalTest(unittest.TestCase):
                 },
             ],
         )
+
+    def test_model_prefix_accepts_supported_rest_evaluation_models(self):
+        self.assertEqual(model_prefix("eegnet"), "eegnet")
+        self.assertEqual(model_prefix("shallow_convnet"), "shallow_convnet")
+        with self.assertRaises(ValueError):
+            model_prefix("unknown")
 
     def test_train_eegnet_writes_epoch_history_csv(self):
         try:
