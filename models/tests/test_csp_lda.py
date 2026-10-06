@@ -2,7 +2,7 @@ import unittest
 
 import numpy as np
 
-from models.csp_lda import fit_csp_lda
+from models.architectures.csp_lda import fit_csp_lda
 
 
 class CspLdaTest(unittest.TestCase):
