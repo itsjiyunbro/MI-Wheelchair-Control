@@ -13,6 +13,12 @@
     "n_components": 4,
     "reg": 1e-6
   },
+  "svm": {
+    "C": 1.0,
+    "max_iter": 2000,
+    "learning_rate": 0.05,
+    "unstandardized": true
+  },
   "eegnet": {
     "batch_size": 64,
     "epochs": 10,
