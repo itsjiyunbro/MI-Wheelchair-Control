@@ -8,13 +8,13 @@ import numpy as np
 if __package__ in (None, ""):
     sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
+from models.architectures.eegnet import create_eegnet
+from models.architectures.shallow_convnet import create_shallow_convnet
 from models.data.eeg_dataset import (
     apply_path_overrides,
     load_config,
     load_rest,
 )
-from models.eegnet import create_eegnet
-from models.shallow_convnet import create_shallow_convnet
 from models.utils.metrics import save_json
 
 
