@@ -8,8 +8,8 @@ import numpy as np
 if __package__ in (None, ""):
     sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
+from models.architectures.shallow_convnet import create_shallow_convnet
 from models.data.eeg_dataset import apply_path_overrides, load_config, load_split
-from models.shallow_convnet import create_shallow_convnet
 from models.utils.metrics import classification_metrics, save_json
 
 
