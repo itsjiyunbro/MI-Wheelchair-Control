@@ -134,6 +134,7 @@ GameObject:
   - component: {fileID: 143557059}
   - component: {fileID: 143557058}
   - component: {fileID: 143557060}
+  - component: {fileID: 143557061}
   m_Layer: 0
   m_Name: WheelchairPlaceholder
   m_TagString: Untagged
@@ -260,6 +261,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EEGWheelchairSimulator.WheelchairMovement
   simulation: {fileID: 857441403}
+  collisionGuard: {fileID: 143557061}
   moveSpeed: 2
   turnSpeed: 60
 --- !u!114 &143557060
@@ -278,6 +280,24 @@ MonoBehaviour:
   movement: {fileID: 143557059}
   port: 5055
   logReceivedMessages: 1
+--- !u!114 &143557061
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 143557053}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9c3e3a2f550687a43b0f50e6b5b9ff92, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EEGWheelchairSimulator.WheelchairCollisionGuard
+  obstacleLayers:
+    serializedVersion: 2
+    m_Bits: 256
+  clearanceRadius: 1.15
+  queryHeight: 0.2
+  skinWidth: 0.025
 --- !u!114 &154409782
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -107,11 +107,16 @@ This project is released under the MIT License.
 
 ## Unity implementation status
 
-The `unity` branch now contains the runnable Unity simulator, primitive wheelchair,
-indoor test course, dashboard HUD, Start/Stop/Reset, and TCP test senders.
-See [Unity setup, completed work, and temporary protocol](unity/README.md).
+The `codex/unity-convergence-hall-b1` branch extends `unity` with the Convergence
+Hall B1 environment, furnished classrooms and lounge, photo-based elevator and
+stair details, interactive doors, wheelchair collision and reverse movement,
+first/third-person views, and a demo free camera.
+See [Unity setup, screenshots, controls, and validation](unity/README.md).
 
-Current integration uses **fake test predictions**, not the trained EEG model.
-The executable development protocol accepts LEFT / RIGHT / FORWARD / STOP;
-Hold/Rest and confidence-based decisions above remain future team plans.
-Open `unity/EEGWheelchairSimulator` in Unity Hub, then open `Assets/Scenes/MainScene.unity`.
+Open `unity/EEGWheelchairSimulator` in Unity Hub with Unity 6000.3.24f1, then open
+`Assets/Scenes/ConvergenceHallB1Scene.unity` and use Play / START.
+
+Current Unity integration uses **fake test predictions**, not the trained EEG model.
+The development protocol accepts LEFT / RIGHT / FORWARD / STOP. Keyboard reverse
+movement does not extend the Python command protocol. Hold/Rest and confidence-based
+policies remain future integration work.

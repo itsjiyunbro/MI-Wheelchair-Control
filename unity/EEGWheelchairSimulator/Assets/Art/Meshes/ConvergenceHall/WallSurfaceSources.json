@@ -1,0 +1,1040 @@
+{
+    "items": [
+        {
+            "path": "RoomsAndCores/B123/West/LowerWall",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "RoomsAndCores/B123/North/LowerWall",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "RoomsAndCores/B101/West/LowerWall",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "RoomsAndCores/B101/South/LowerWall",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "RoomsAndCores/B102/West/LowerWall",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "RoomsAndCores/B102/South/LowerWall",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "RoomsAndCores/B103/West/CorridorGlazing/OpaqueRemainderLowerWall1",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "RoomsAndCores/B103/South/LowerWall",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "RoomsAndCores/B104/West/LowerWall",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "RoomsAndCores/B124/West/CorridorGlazing/OpaqueRemainderLowerWall1",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "RoomsAndCores/B124/South/LowerWall",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "RoomsAndCores/B123/South/LowerWall",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "RoomsAndCores/B105/West/LowerWall",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "RoomsAndCores/WestWC/West/LowerWall",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "RoomsAndCores/WestLiftCore/West/LowerWall",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "RoomsAndCores/WestLiftCore/South/LowerWall",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "RoomsAndCores/WestStair/West/LowerWall",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "RoomsAndCores/WestStair/North/LowerWall",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "RoomsAndCores/WestStair/South/LowerWall",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "RoomsAndCores/B108/North/LowerWall",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "RoomsAndCores/B109/North/LowerWall",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "RoomsAndCores/B109/South/LowerWall",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "RoomsAndCores/B107/West/LowerWall",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "RoomsAndCores/B107/North/LowerWall",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "RoomsAndCores/B106/West/LowerWall",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "RoomsAndCores/B106/North/LowerWall",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "RoomsAndCores/SunkenVoid/West/LowerWall",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "RoomsAndCores/SunkenVoid/North/LowerWall",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "RoomsAndCores/SunkenVoid/South/LowerWall",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "RoomsAndCores/B110/North/LowerWall",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "RoomsAndCores/B110/South/LowerWall",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "RoomsAndCores/B111/West/LowerWall",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "RoomsAndCores/B111/South/LowerWall",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "RoomsAndCores/B112/West/LowerWall",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "RoomsAndCores/NorthWC/North/LowerWall",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "RoomsAndCores/B113/North/LowerWall",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "RoomsAndCores/B113/South/LowerWall",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "RoomsAndCores/B114/North/CorridorGlazing/OpaqueRemainderLowerWall1",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "RoomsAndCores/B114/South/CorridorGlazing/OpaqueRemainderLowerWall1",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "RoomsAndCores/EastService/West/LowerWall",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "RoomsAndCores/B115/North/LowerWall",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "RoomsAndCores/B116/East/LowerWall",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "RoomsAndCores/B116/North/LowerWall",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "RoomsAndCores/B117/West/LowerWall",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "RoomsAndCores/B117/East/LowerWall",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "RoomsAndCores/B117/North/LowerWall",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "RoomsAndCores/B118/West/LowerWall",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "RoomsAndCores/B118/East/LowerWall",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "RoomsAndCores/B118/North/LowerWall",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "RoomsAndCores/B119/West/LowerWall",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "RoomsAndCores/B119/East/LowerWall",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "RoomsAndCores/B119/North/LowerWall",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "RoomsAndCores/B120/West/LowerWall",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "RoomsAndCores/B120/East/LowerWall",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "RoomsAndCores/B120/North/LowerWall",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "RoomsAndCores/B121/West/LowerWall",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "RoomsAndCores/B121/North/LowerWall",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "RoomsAndCores/EastService/North/LowerWall",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "RoomsAndCores/EastService/South/LowerWall",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "RoomsAndCores/B116/West/CorridorGlazing/OpaqueRemainderLowerWall0",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "RoomsAndCores/B116/West/CorridorGlazing/OpaqueRemainderLowerWall3",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "RoomsAndCores/B116/South/LowerWall",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "RoomsAndCores/B117/South/LowerWall",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "RoomsAndCores/B118/South/LowerWall",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "RoomsAndCores/B119/South/LowerWall",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "RoomsAndCores/B120/South/LowerWall",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "RoomsAndCores/B121/South/LowerWall",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "RoomsAndCores/B122/West/LowerWall",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "RoomsAndCores/B122/North/LowerWall",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "RoomsAndCores/B122/South/LowerWall",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "RoomsAndCores/B124Wing/North/LowerWall",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "RoomsAndCores/B124Wing/South/LowerWall",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "RoomsAndCores/EastLift/North/LowerWall",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "RoomsAndCores/EastLift/South/LowerWall",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "RoomsAndCores/EastLift/East/LowerWall",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "RoomsAndCores/EastStair/North/LowerWall",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "RoomsAndCores/EastStair/South/LowerWall",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "RoomsAndCores/Lounge/North/LowerWall",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "CoreHalls/B112ElevatorHall/LeftReturn",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "CoreHalls/B112ElevatorHall/RightReturn",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "CoreHalls/B112ElevatorHall/MeasuredCabin/RearWall",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "CoreHalls/B112ElevatorHall/RecessedWallSurround/LeftWall",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "CoreHalls/B112ElevatorHall/MeasuredCabin/RightWall",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "CoreHalls/B112ElevatorHall/RecessedWallSurround/RightWall",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "CoreHalls/B109ElevatorHall/LeftWallElevator/MeasuredCabin/RearWall",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "CoreHalls/B109ElevatorHall/LeftWallElevator/RecessedWallSurround/LeftWall",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "CoreHalls/B109ElevatorHall/LeftWallElevator/MeasuredCabin/RightWall",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "CoreHalls/B109ElevatorHall/LeftWallElevator/RecessedWallSurround/RightWall",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "CoreHalls/B112Stairwell/UnderStairStorage/LeftSlopedWall",
+            "asset": "Assets/Art/Meshes/ConvergenceHall/StairStorage_LeftSlopedWall_B112Stairwell.asset",
+            "name": "StairStorage_LeftSlopedWall_B112Stairwell",
+            "cube": false,
+            "enabled": true
+        },
+        {
+            "path": "CoreHalls/B112Stairwell/UnderStairStorage/FrontRightPier",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "CoreHalls/B109Stairwell/UnderStairStorage/LeftSlopedWall",
+            "asset": "Assets/Art/Meshes/ConvergenceHall/StairStorage_LeftSlopedWall_B109Stairwell.asset",
+            "name": "StairStorage_LeftSlopedWall_B109Stairwell",
+            "cube": false,
+            "enabled": true
+        },
+        {
+            "path": "CoreHalls/B109Stairwell/UnderStairStorage/FrontRightPier",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "RoomsAndCores/B111/North/LowerWall",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "RoomsAndCores/B111/SouthNotch/LowerWall",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "DoorsAndSigns/B111Entrance/Header",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "CoreHalls/B112ElevatorHall/RecessedWallSurround/OverDoorWall",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "CoreHalls/B109ElevatorHall/LeftWallElevator/RecessedWallSurround/OverDoorWall",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "PlanDoors/B101_North_West/TransomTopFrame",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "PlanDoors/B101_North_East/TransomTopFrame",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "PlanDoors/B102_North_West/TransomTopFrame",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "PlanDoors/B102_North_East/TransomTopFrame",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "PlanDoors/B103_North_West/TransomTopFrame",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "PlanDoors/B103_North_East/TransomTopFrame",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "PlanDoors/B104_East_Entry/TransomTopFrame",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "PlanDoors/B105_East_South/TransomTopFrame",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "PlanDoors/B106_South_West/TransomTopFrame",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "PlanDoors/B106_South_East/TransomTopFrame",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "PlanDoors/B107_South_West/TransomTopFrame",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "PlanDoors/B107_South_East/TransomTopFrame",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "PlanDoors/B108_West_North/TransomTopFrame",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "PlanDoors/B108_South_East/TransomTopFrame",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "PlanDoors/B109_West_North/TransomTopFrame",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "PlanDoors/B109_West_South/TransomTopFrame",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "PlanDoors/B110_West_North/TransomTopFrame",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "PlanDoors/B112_East_North/TransomTopFrame",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "PlanDoors/B112_East_South/TransomTopFrame",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "PlanDoors/B113_West_South/TransomTopFrame",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "PlanDoors/B114_West_North/TransomTopFrame",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "PlanDoors/B114_West_South/TransomTopFrame",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "PlanDoors/B115_West_North/TransomTopFrame",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "PlanDoors/B115_West_South/TransomTopFrame",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "PlanDoors/B124_North_West/TransomTopFrame",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "RoomsAndCores/Lounge/South/CorridorGlazing/OpaqueRemainderLowerWall1",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "CoreHalls/B112Stairwell/UnderStairStorage/FrontLeftPier",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "CoreHalls/B112Stairwell/UnderStairStorage/FrontHeader",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "CoreHalls/B109Stairwell/UnderStairStorage/FrontLeftPier",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "CoreHalls/B109Stairwell/UnderStairStorage/FrontHeader",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "RoomsAndCores/B112/South/LowerWall",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "BluebellB112Connection/ConnectionWall",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "RoomsAndCores/B103/West/LowerWall",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "RoomsAndCores/WestWC/North/LowerWall",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "RoomsAndCores/WestLiftCore/North/LowerWall",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "CompletedRoomCeilings/WestLiftCoreCeiling/CeilingEdgeReturn",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "CompletedRoomCeilings/EastLiftCeiling/CeilingEdgeReturn",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "RoomsAndCores/Lounge/South/CorridorGlazing/OpaqueRemainderLowerWall0",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "CompletedRoomCeilings/LoungeCeiling/CeilingEdgeReturn",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "RoomsAndCores/EastStair/East/LowerWall",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "RoomsAndCores/Lounge/East/CorridorGlazing/OpaqueRemainderLowerWall0",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "RoomsAndCores/Lounge/East/CorridorGlazing/OpaqueRemainderLowerWall5",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "CompletedRoomCeilings/WestLiftCoreCeiling/CeilingEdgeReturnZ0",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "CompletedRoomCeilings/WestLiftCoreCeiling/CeilingEdgeReturnZ1",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "CompletedRoomCeilings/WestLiftCoreCeiling/CeilingEdgeReturnX1",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "CompletedRoomCeilings/EastLiftCeiling/CeilingEdgeReturnX0",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "CompletedRoomCeilings/EastLiftCeiling/CeilingEdgeReturnZ1",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "CompletedRoomCeilings/EastLiftCeiling/CeilingEdgeReturnZ0",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "CompletedRoomCeilings/LoungeCeiling/CeilingEdgeReturnZ1",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "RoomsAndCores/SunkenVoid/East/LowerWall",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        },
+        {
+            "path": "RoomsAndCores/B111/East/LowerWall",
+            "asset": "Library/unity default resources",
+            "name": "Cube",
+            "cube": true,
+            "enabled": true
+        }
+    ]
+}

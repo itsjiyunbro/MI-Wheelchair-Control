@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.InputSystem;
 
 namespace EEGWheelchairSimulator
@@ -22,11 +22,12 @@ namespace EEGWheelchairSimulator
                 return;
 
             bool forward = keyboard.wKey.isPressed || keyboard.upArrowKey.isPressed;
+            bool reverse = keyboard.sKey.isPressed || keyboard.downArrowKey.isPressed;
             bool left = keyboard.aKey.isPressed || keyboard.leftArrowKey.isPressed;
             bool right = keyboard.dKey.isPressed || keyboard.rightArrowKey.isPressed;
             float turn = (right ? 1f : 0f) - (left ? 1f : 0f);
 
-            movement.ApplyInput(forward, turn, Time.deltaTime);
+            movement.ApplyDirectionalInput((forward?1f:0f)-(reverse?1f:0f), turn, Time.deltaTime);
         }
     }
 }

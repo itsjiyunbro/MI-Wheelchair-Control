@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace EEGWheelchairSimulator
 {
@@ -16,6 +16,7 @@ namespace EEGWheelchairSimulator
         public WheelchairControlSource ControlSource => controlSource;
         // A small notification lets stateful input adapters discard cached/pending commands.
         public event System.Action InputStateCleared;
+        public event System.Action SimulationReset;
 
         private bool running;
         private bool hasInitialPose;
@@ -71,6 +72,7 @@ namespace EEGWheelchairSimulator
 
         public void StartSimulation()
         {
+            var free=followCamera?followCamera.GetComponent<DemoFreeCamera>():null;if(free)free.ExitFreeView();
             if (!isActiveAndEnabled || !CaptureInitialPose())
                 return;
             running = true;
@@ -88,12 +90,14 @@ namespace EEGWheelchairSimulator
 
         public void ResetSimulation()
         {
+            var free=followCamera?followCamera.GetComponent<DemoFreeCamera>():null;if(free)free.ExitFreeView();
             StopSimulation();
             if (!CaptureInitialPose())
                 return;
             movement.transform.SetPositionAndRotation(initialPosition, initialRotation);
             if (followCamera != null)
                 followCamera.SnapToTarget();
+            SimulationReset?.Invoke();
         }
     }
 }

@@ -13,7 +13,7 @@ Unity 기본 Cube/Cylinder로 만든 정적인 테스트 모델입니다. 기존
 7. Python 모드는 기존 절차 그대로 확인합니다. Control Source=Python → Play → 아래 송신기 실행 → START. Prediction HUD와 동작이 계속 반영돼야 합니다.
 
 ```powershell
-Set-Location '<저장소 경로>\unity\EEGWheelchairSimulator\Tools\PythonTestSender'
+Set-Location 'C:\Users\kjm03\OneDrive\Documents\UnityProjects\EEGWheelchairSimulator\Tools\PythonTestSender'
 powershell -NoProfile -ExecutionPolicy Bypass -File .\run_sender.ps1 -Stream
 ```
 

@@ -89,7 +89,7 @@ Screen Space Overlay 유지. CanvasScaler는 Scale With Screen Size, Reference R
 6. PowerShell에서 기존 송신기 실행:
 
 ```powershell
-Set-Location '<저장소 경로>\unity\EEGWheelchairSimulator'
+Set-Location 'C:\Users\kjm03\OneDrive\Documents\UnityProjects\EEGWheelchairSimulator'
 powershell -ExecutionPolicy Bypass -File .\Tools\PythonTestSender\run_sender.ps1 -Stream
 ```
 
@@ -101,3 +101,4 @@ powershell -ExecutionPolicy Bypass -File .\Tools\PythonTestSender\run_sender.ps1
 12. Console에 빨간 오류가 없는지 확인.
 
 송신기는 기존의 py → python → project venv → Codex 내부 Python fallback 탐색을 그대로 사용합니다. 이번 작업에서 Python 환경이나 송신 코드를 변경하지 않았습니다.
+

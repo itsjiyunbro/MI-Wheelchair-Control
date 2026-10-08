@@ -45,7 +45,7 @@ Unity의 STOP 버튼은 시뮬레이션을 STOPPED로 바꾸고 입력을 차단
 6. 별도 PowerShell 창에서 다음을 실행합니다.
 
 ```powershell
-Set-Location '<저장소 경로>\unity\EEGWheelchairSimulator\Tools\PythonTestSender'
+Set-Location 'C:\Users\kjm03\OneDrive\Documents\UnityProjects\EEGWheelchairSimulator\Tools\PythonTestSender'
 powershell -NoProfile -ExecutionPolicy Bypass -File .\run_sender.ps1
 ```
 

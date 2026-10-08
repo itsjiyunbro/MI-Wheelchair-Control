@@ -226,14 +226,14 @@ namespace EEGWheelchairSimulator.Editor
             if (sceneText != File.ReadAllText("Assets/Scenes/MainScene.unity")) throw new InvalidOperationException("Course setup is not idempotent.");
             var scene = EditorSceneManager.OpenScene("Assets/Scenes/MainScene.unity");
             var course = scene.GetRootGameObjects().Single(go => go.name == "IndoorTestCourse");
-            if (course.GetComponentsInChildren<Collider>().Length != 0
+            if (course.GetComponentsInChildren<Rigidbody>().Length != 0
                 || course.GetComponentsInChildren<MonoBehaviour>().Any(c => !(c is UnityEngine.UI.Text)))
-                throw new InvalidOperationException("Environment must be visual only.");
+                throw new InvalidOperationException("Environment must not introduce Rigidbody or runtime control behaviour.");
             foreach (Renderer renderer in course.GetComponentsInChildren<Renderer>())
                 if (renderer.bounds.min.x < -20 || renderer.bounds.max.x > 20 || renderer.bounds.min.z < -20 || renderer.bounds.max.z > 20)
                     throw new InvalidOperationException("Environment exceeds Ground bounds: " + renderer.name);
             CheckRouteAndPreview(course);
-            Debug.Log("INDOOR_SCENE_OK: prefab and scene reload, no duplicates, within 40x40 Ground, no added collision/runtime behaviour.");
+            Debug.Log("INDOOR_SCENE_OK: prefab and scene reload, no duplicates, within 40x40 Ground, no Rigidbody/runtime control behaviour.");
             Step07PredictionValidation.Begin(); // Validation only; never executes an earlier setup.
         }
 

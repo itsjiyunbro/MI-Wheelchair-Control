@@ -1,5 +1,7 @@
 # 에셋 작업 2단계 — 실내 휠체어 테스트 코스
 
+> 현재 벽 통과 방지 단계가 추가되었습니다. 아래는 환경 제작 당시 기록이며, 두 맵에는 이제 벽·문 Collider와 공통 이동 제한이 있습니다. 현재 동작은 [WallCollision-Guide.md](WallCollision-Guide.md)를 참고하세요.
+
 Unity Primitive와 6개 환경 머티리얼로 만든 정적 시연 코스입니다. 기존 Ground, 휠체어 루트/비주얼, 이동·입력·카메라·HUD·통신 코드는 보존합니다.
 
 ## Unity에서 확인하기
@@ -58,7 +60,7 @@ Camera Follow offset `(0,4.5,-7)`과 기존 smoothing은 변경하지 않았습�
 기존 Python 제어와 Prediction HUD를 그대로 사용할 수 있습니다. Control Source=Python → Play → 기존 송신기 실행 → START 순서입니다.
 
 ```powershell
-Set-Location '<저장소 경로>\unity\EEGWheelchairSimulator\Tools\PythonTestSender'
+Set-Location 'C:\Users\kjm03\OneDrive\Documents\UnityProjects\EEGWheelchairSimulator\Tools\PythonTestSender'
 # 수동 명령: 코너에서 LEFT/RIGHT를 보내는 시연에 사용
 powershell -NoProfile -ExecutionPolicy Bypass -File .\run_sender.ps1
 

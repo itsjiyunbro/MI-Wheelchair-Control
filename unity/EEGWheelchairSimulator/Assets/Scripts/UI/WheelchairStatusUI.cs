@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 using System.Globalization;
 
@@ -24,7 +24,7 @@ namespace EEGWheelchairSimulator
 
         private bool hasDisplayed;
         private string lastControl;
-        private bool lastMoving;
+        private int lastMoveDirection;
         private int lastSteering;
         private int lastHeading;
         private bool lastRunning;
@@ -47,7 +47,7 @@ namespace EEGWheelchairSimulator
             if (controlText == null || moveText == null || steeringText == null || headingText == null)
                 return;
 
-            bool moving = movement != null && movement.IsMoving;
+            int moveDirection = movement != null ? movement.MoveDirection : 0;
             float turn = movement != null ? movement.TurnInput : 0f;
             int steering = turn < 0f ? -1 : turn > 0f ? 1 : 0;
             // Rounding 359.9 degrees must wrap to 0, never display 360.
@@ -65,8 +65,8 @@ namespace EEGWheelchairSimulator
 
             if (!hasDisplayed || lastControl != controlSourceLabel)
                 controlText.text = "CONTROL: " + controlSourceLabel;
-            if (!hasDisplayed || lastMoving != moving)
-                moveText.text = moving ? "MOVE: FORWARD" : "MOVE: STOPPED";
+            if (!hasDisplayed || lastMoveDirection != moveDirection)
+                moveText.text = moveDirection>0?"MOVE: FORWARD":moveDirection<0?"MOVE: BACKWARD":"MOVE: STOPPED";
             if (!hasDisplayed || lastSteering != steering)
                 steeringText.text = steering < 0 ? "STEERING: LEFT" : steering > 0 ? "STEERING: RIGHT" : "STEERING: STRAIGHT";
             if (!hasDisplayed || lastHeading != heading)
@@ -91,7 +91,7 @@ namespace EEGWheelchairSimulator
 
             hasDisplayed = true;
             lastControl = controlSourceLabel;
-            lastMoving = moving;
+            lastMoveDirection = moveDirection;
             lastSteering = steering;
             lastHeading = heading;
             lastRunning = running;
