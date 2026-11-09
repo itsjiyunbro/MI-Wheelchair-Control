@@ -8,24 +8,18 @@ import numpy as np
 import torch
 
 EVALUATE = Path(__file__).resolve().parent
-ROOT = EVALUATE.parents[1]
-LOCAL_PROJECT = ROOT / "model_train_compare_folder"
+UNITY = EVALUATE.parent
+CHECKPOINTS = UNITY.parent / "models" / "checkpoints"
+sys.path.insert(0, str(UNITY))
 MODEL_NAMES = ("eegnet", "shallow_convnet", "eeg_tcnet", "lmda")
 LABELS = ("Left", "Right")
 INPUT_SHAPE = (9, 320)
 
 
 def load_model(name, checkpoint=None):
-    if LOCAL_PROJECT.is_dir():
-        package = "model_train_compare_folder.models.architectures"
-        checkpoints = LOCAL_PROJECT / "colab" / "checkpoints"
-    else:
-        package = "models.architectures"
-        checkpoints = ROOT / "models" / "checkpoints"
-    sys.path.insert(0, str(ROOT))
-    module = import_module(f"{package}.{name}")
+    module = import_module(f"architectures.{name}")
     model = getattr(module, f"create_{name}")()
-    path = checkpoint if checkpoint is not None else checkpoints / f"{name}_best.pt"
+    path = checkpoint if checkpoint is not None else CHECKPOINTS / f"{name}_best.pt"
     model.load_state_dict(torch.load(path, map_location="cpu", weights_only=True))
     return model.eval()
 
