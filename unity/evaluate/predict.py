@@ -8,18 +8,25 @@ import numpy as np
 import torch
 
 EVALUATE = Path(__file__).resolve().parent
-UNITY = EVALUATE.parent
-CHECKPOINTS = UNITY.parent / "models" / "checkpoints"
-sys.path.insert(0, str(UNITY))
+ROOT = EVALUATE.parents[1]
+SAMPLE = EVALUATE / "sample"
+LOCAL_PROJECT = ROOT / "model_train_compare_folder"
+sys.path.insert(0, str(ROOT))
 MODEL_NAMES = ("eegnet", "shallow_convnet", "eeg_tcnet", "lmda")
 LABELS = ("Left", "Right")
 INPUT_SHAPE = (9, 320)
 
 
 def load_model(name, checkpoint=None):
-    module = import_module(f"architectures.{name}")
+    if LOCAL_PROJECT.is_dir():
+        package = "model_train_compare_folder.models.architectures"
+        checkpoints = LOCAL_PROJECT / "colab" / "checkpoints"
+    else:
+        package = "models.architectures"
+        checkpoints = ROOT / "models" / "checkpoints"
+    module = import_module(f"{package}.{name}")
     model = getattr(module, f"create_{name}")()
-    path = checkpoint if checkpoint is not None else CHECKPOINTS / f"{name}_best.pt"
+    path = checkpoint if checkpoint is not None else checkpoints / f"{name}_best.pt"
     model.load_state_dict(torch.load(path, map_location="cpu", weights_only=True))
     return model.eval()
 
@@ -36,10 +43,11 @@ def predict(model, windows, threshold=0.90):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Predict Unity commands from standardized EEG.")
+    parser = argparse.ArgumentParser(description="Standardize saved EEG and predict Unity commands.")
     parser.add_argument("--model", choices=MODEL_NAMES, default="eegnet")
     parser.add_argument("--checkpoint", type=Path)
-    parser.add_argument("--input", type=Path, default=EVALUATE / "sample" / "X_test_sample.npy")
+    parser.add_argument("--input", type=Path, default=SAMPLE / "X_test_unstd_sample.npy")
+    parser.add_argument("--standardized", action="store_true", help="Skip standardization for an already standardized input file.")
     parser.add_argument("--threshold", type=float, default=0.90)
     args = parser.parse_args()
 
@@ -53,6 +61,11 @@ def main():
         parser.error("--input must have shape (9, 320) or (N, 9, 320) with N > 0")
     if windows.dtype.kind not in "fiu" or not np.isfinite(windows).all():
         parser.error("--input must contain finite real EEG values")
+
+    if not args.standardized:
+        mean = np.load(SAMPLE / "train_channel_mean.npy", allow_pickle=False)
+        std = np.load(SAMPLE / "train_channel_std.npy", allow_pickle=False)
+        windows = (windows - mean) / std
 
     model = load_model(args.model, args.checkpoint)
     for result in predict(model, windows, args.threshold):
