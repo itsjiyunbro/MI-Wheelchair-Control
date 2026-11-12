@@ -56,9 +56,25 @@ git clone --branch unity-convergence-hall-1 --single-branch https://github.com/i
 
 추가 원본 화면은 [images/convergence/](images/convergence/)에 있습니다. 설명을 덧붙인 PDF 대신 실제 구현 화면을 포함했습니다.
 
-## Python 입력
+## 샘플 EEG 추론으로 Unity 조작
 
-기존 TCP + NDJSON 테스트 입력을 유지합니다. 기본 포트는 **5055**, 현재 명령은 **LEFT / RIGHT / FORWARD / STOP**입니다. 키보드 후진은 Python 프로토콜에 새 명령을 추가하지 않습니다. HOLD/REST/IDLE 또는 실제 모델 confidence 기반 정책은 추가 작업입니다.
+팀의 `unity/evaluate/predict.py`를 실행해 저장된 EEG 윈도 3개를 학습된 EEGNet으로 분류합니다. 송신기가 모델의 `label`과 `confidence`를 읽고 `Left`는 `LEFT`, `Hold`는 `STOP`, `Right`는 `RIGHT`로 변환해 기존 Unity TCP 수신기(`127.0.0.1:5055`)에 보냅니다. `Hold`는 모델의 기본 confidence 기준 0.90 미만에서 나오며, Unity에서는 회전이 멈추고 시뮬레이션의 RUNNING 상태가 유지됩니다.
+
+저장소 루트에서 다음 순서로 실행하세요.
+
+1. Python 가상환경에서 `python -m pip install -r unity/evaluate/requirements.txt`를 실행합니다.
+2. Unity에서 `Assets/Scenes/ConvergenceHallB1Scene.unity`를 열고 Play를 누릅니다. `SimulationController`의 **Control Source**를 **Python**으로 설정하고 **START**를 누릅니다. Console에서 `WAITING at 127.0.0.1:5055`를 확인합니다.
+3. 같은 가상환경에서 아래 명령을 실행합니다.
+
+```powershell
+python unity/EEGWheelchairSimulator/Tools/PythonTestSender/send_eeg_predictions.py
+```
+
+기본 샘플은 EEGNet에서 제자리 좌회전 → 정지 → 제자리 우회전을 차례로 재생합니다. 송신기는 각 예측을 1초씩 적용한 후 연결을 종료합니다. 재생 간격은 `--interval`로 설정하고, `--` 뒤에 `predict.py` 옵션을 전달할 수 있습니다. 예를 들어 `--interval 1.5 -- --model eegnet --threshold 0.90`을 붙일 수 있습니다. 이 데모는 따로 선별된 EEG 윈도 3개의 저장 데이터 재생입니다. 데이터 형식과 모델 옵션은 [팀 추론 코드 안내](evaluate/README.md)를 참고하세요.
+
+## Python 테스트 입력
+
+기존 TCP + NDJSON 테스트 입력의 기본 포트는 **5055**, 명령은 **LEFT / RIGHT / FORWARD / STOP**입니다. 키보드 후진은 Python 프로토콜에 새 명령을 추가하지 않습니다. 테스트 송신기의 confidence는 테스트 값이며, 샘플 EEG 송신기의 보류 판단은 위의 모델 추론 단계에서 처리합니다.
 
 ```powershell
 cd unity/EEGWheelchairSimulator/Tools/PythonTestSender
