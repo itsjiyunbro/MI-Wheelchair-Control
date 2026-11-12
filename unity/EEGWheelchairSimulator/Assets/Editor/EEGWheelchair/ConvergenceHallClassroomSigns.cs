@@ -36,7 +36,13 @@ namespace EEGWheelchairSimulator.Editor
         }
         static void Plaque(Transform p,string room,Vector3 at)
         {
-            Names(room,out var korean,out var english);var sign=Group(p,"PhotoRoomSign");sign.localPosition=at;sign.localRotation=Quaternion.identity;sign.localScale=Vector3.one*.65f;
+            Names(room,out var korean,out var english);
+            CreateRoomPlaque(p,"PhotoRoomSign",room,korean,english,at);
+        }
+        internal static Transform CreateRoomPlaque(Transform parent,string objectName,string room,string korean,string english,Vector3 at)
+        {
+            if(!font||!white||!navy||!metal)LoadMaterials();
+            var sign=Group(parent,objectName);sign.localPosition=at;sign.localRotation=Quaternion.identity;sign.localScale=Vector3.one*.65f;
             Box(sign,"NavyBody",Vector3.zero,new Vector3(.20f,.20f,.012f),navy);
             Box(sign,"WhiteHeader",new Vector3(0,.075f,-.007f),new Vector3(.20f,.05f,.003f),white);
             Text(sign,"RoomNumber",room,new Vector3(.002f,.075f,-.010f),new Vector2(.182f,.047f),43,Color.black,TextAnchor.MiddleRight);
@@ -44,22 +50,28 @@ namespace EEGWheelchairSimulator.Editor
             Box(sign,"Divider",new Vector3(0,-.049f,-.009f),new Vector3(.180f,.001f,.002f),metal);
             Text(sign,"EnglishName",english,new Vector3(0,-.063f,-.010f),new Vector2(.180f,.022f),14,Color.white,TextAnchor.MiddleLeft);
             Box(sign,"BraillePlate",new Vector3(-.022f,-.085f,-.010f),new Vector3(.136f,.016f,.003f),metal);
-            // Standard uncontracted English braille: capital B, number sign, then room digits.
-            int[] digits={26,1,3,9,25,17,11,27,19,10}; // bit 0..5 = braille dots 1..6
-            var codes=new[]{32,3,60}.Concat(room.Substring(1).Select(c=>digits[c-'0'])).ToArray();
+            int[] digits={26,1,3,9,25,17,11,27,19,10};
+            bool basement=room.StartsWith("B",StringComparison.Ordinal);
+            var prefix=basement?new[]{32,3,60}:new[]{60};
+            var codes=prefix.Concat(room.Substring(basement?1:0).SelectMany(c=>c=='-'?new[]{36,60}:new[]{digits[c-'0']})).ToArray();
             var dots=Group(sign,"BrailleRoomNumber");foreach(Transform old in dots.Cast<Transform>().ToArray())UnityEngine.Object.DestroyImmediate(old.gameObject);
             for(int i=0;i<codes.Length;i++)for(int d=0;d<6;d++)if((codes[i]&(1<<d))!=0)
             {
                 var go=GameObject.CreatePrimitive(PrimitiveType.Sphere);go.name="Cell"+i+"Dot"+(d+1);UnityEngine.Object.DestroyImmediate(go.GetComponent<Collider>());var t=go.transform;t.SetParent(dots,false);
                 t.localPosition=new Vector3(-.079f+i*.018f+(d/3)*.003f,-.082f-(d%3)*.003f,-.012f);t.localScale=Vector3.one*.0018f;t.GetComponent<Renderer>().sharedMaterial=metal;
             }
+            return sign;
+        }
+        static void LoadMaterials()
+        {
+            font=AssetDatabase.LoadAssetAtPath<Font>(FontPath);if(!font)throw new Exception("Korean sign font missing.");
+            const string mats="Assets/Art/Materials/ConvergenceHall/";navy=AssetDatabase.LoadAssetAtPath<Material>(mats+"Navy.mat");metal=AssetDatabase.LoadAssetAtPath<Material>(mats+"Metal.mat");
+            white=AssetDatabase.LoadAssetAtPath<Material>(mats+"RoomSignWhite.mat");
+            if(!white){white=new Material(Shader.Find("Universal Render Pipeline/Lit")){name="RoomSignWhite"};white.SetColor("_BaseColor",new Color(.94f,.945f,.94f));white.SetFloat("_Smoothness",.45f);AssetDatabase.CreateAsset(white,mats+"RoomSignWhite.mat");}
         }
         public static void ApplyTo(GameObject root)
         {
-            font=AssetDatabase.LoadAssetAtPath<Font>(FontPath);if(!font)throw new Exception("Korean sign font missing.");
-            const string mats="Assets/Art/Materials/ConvergenceHall/";white=AssetDatabase.LoadAssetAtPath<Material>(mats+"WarmWhite.mat");navy=AssetDatabase.LoadAssetAtPath<Material>(mats+"Navy.mat");metal=AssetDatabase.LoadAssetAtPath<Material>(mats+"Metal.mat");
-            white=AssetDatabase.LoadAssetAtPath<Material>(mats+"RoomSignWhite.mat");
-            if(!white){white=new Material(Shader.Find("Universal Render Pipeline/Lit")){name="RoomSignWhite"};white.SetColor("_BaseColor",new Color(.94f,.945f,.94f));white.SetFloat("_Smoothness",.45f);AssetDatabase.CreateAsset(white,mats+"RoomSignWhite.mat");}
+            LoadMaterials();
             foreach(Transform door in root.transform.Find("PlanDoors"))
             {
                 string room=door.name.Split('_')[0];if(!room.StartsWith("B1"))continue;if(room=="B124Wing")room="B124";

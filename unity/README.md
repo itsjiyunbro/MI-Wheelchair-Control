@@ -1,8 +1,8 @@
-# Unity - 컨버전스홀 B1 휠체어 시뮬레이터
+# Unity - 컨버전스홀 B1·1F 휠체어 시뮬레이터
 
-2026-10-08 기준. `unity`에서 분기한 `codex/unity-convergence-hall-b1` 작업 브랜치입니다.
+`unity`에서 분기한 `unity-convergence-hall-1` 작업 브랜치입니다.
 
-컨버전스홀 지하 1층을 안내도와 현장 사진 기준으로 구현했습니다. 실제 EEG 모델 연결 전 단계이며 키보드와 Python 테스트 송신기로 주행·통신을 확인할 수 있습니다.
+컨버전스홀 지하 1층과 1층을 안내도와 현장 사진 기준으로 구현했습니다. 두 층은 동·서 엘리베이터와 계단실로 이어집니다. 실제 EEG 모델 연결 전 단계이며 키보드와 Python 테스트 송신기로 주행·통신을 확인할 수 있습니다.
 
 ![B112 강의실](images/convergence-b112.png)
 ![라운지](images/convergence-lounge.png)
@@ -10,14 +10,15 @@
 ## 처음 실행하기
 
 ```powershell
-git clone --branch codex/unity-convergence-hall-b1 --single-branch https://github.com/itsjiyunbro/MI-Wheelchair-Control.git
+git clone --branch unity-convergence-hall-1 --single-branch https://github.com/itsjiyunbro/MI-Wheelchair-Control.git
 ```
 
 1. Windows에서는 `C:\Projects`처럼 짧은 경로에 복제하세요. 경로가 길면 Unity 패키지 임포트가 실패할 수 있습니다. Unity Hub에서 **Unity 6000.3.24f1**을 준비합니다.
 2. `unity/EEGWheelchairSimulator` 폴더를 Unity 프로젝트로 엽니다.
 3. 최초 패키지 복원과 에셋 임포트가 완료될 때까지 기다립니다.
 4. `Assets/Scenes/ConvergenceHallB1Scene.unity`를 엽니다.
-5. Control Source를 **Keyboard**로 설정하고 Play, **START** 순서로 시작합니다.
+5. Control Source를 **Keyboard**로 설정하고 Play, **START** 순서로 시작합니다. 기본 시작 위치는 지하 1층입니다.
+6. 휠체어로 층을 이동하려면 엘리베이터에 탑승해 **B1 / 1F**를 선택합니다. 자유 시점에서 계단을 따라 이동하거나 **PgUp / PgDn**으로 층을 바로 확인할 수 있습니다. [1층과 엘리베이터 안내](EEGWheelchairSimulator/Docs/FirstFloorAndElevators.md)를 참고하세요.
 
 완성된 Scene과 Prefab이 포함돼 있으므로 환경 생성 메뉴를 다시 실행할 필요는 없습니다. `MainScene`, 실내 테스트 코스와 재활 코스도 함께 보존했습니다. 실행 파일은 포함하지 않습니다. 빌드할 때는 Build Profiles의 Scene List에 B1 장면을 등록하세요.
 

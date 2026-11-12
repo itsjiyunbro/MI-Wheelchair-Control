@@ -60,7 +60,8 @@ namespace EEGWheelchairSimulator
             if(automatic&&actor)
             {
                 var point=transform.InverseTransformPoint(actor.transform.position)-interactionPoint;
-                if(Mathf.Abs(point.x)<sensorHalfWidth&&Mathf.Abs(point.z)<2.05f)SetOpen(true);
+                if(Mathf.Abs(actor.transform.position.y-InteractionPoint.y)>2.0f)SetOpen(false);
+                else if(Mathf.Abs(point.x)<sensorHalfWidth&&Mathf.Abs(point.z)<2.05f)SetOpen(true);
                 else if(Mathf.Abs(point.z)>2.8f||Mathf.Abs(point.x)>sensorHalfWidth+.7f)SetOpen(false);
             }
             if(delta<=0||Mathf.Abs(progress-targetProgress)<.0001f)return;
@@ -78,7 +79,7 @@ namespace EEGWheelchairSimulator
         }
         public bool InReach(Transform wheelchair,float maximum=2.15f)
         {
-            var delta=InteractionPoint-wheelchair.position;delta.y=0;if(delta.magnitude>maximum)return false;
+            var delta=InteractionPoint-wheelchair.position;if(Mathf.Abs(delta.y)>2.0f)return false;delta.y=0;if(delta.magnitude>maximum)return false;
             var origin=wheelchair.position+Vector3.up*.55f;var aim=InteractionPoint;aim.y=origin.y;
             foreach(var hit in Physics.RaycastAll(origin,(aim-origin).normalized,Vector3.Distance(aim,origin)-.015f,LayerMask.GetMask("WheelchairObstacle"),QueryTriggerInteraction.Ignore))
             {

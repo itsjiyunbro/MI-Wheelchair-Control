@@ -23,7 +23,16 @@ namespace EEGWheelchairSimulator
         private Vector3 initialPosition;
         private Quaternion initialRotation;
 
-        public bool IsRunning => isActiveAndEnabled && running;
+        private Object movementLock;
+        public bool MovementLocked => movementLock;
+        public bool IsRunning => isActiveAndEnabled && running && !MovementLocked;
+        public bool TryLockMovement(Object owner)
+        {
+            if (!owner || (movementLock && movementLock != owner)) return false;
+            movementLock = owner; StopSimulation(); return true;
+        }
+        public void UnlockMovement(Object owner)
+        { if (movementLock == owner) { movementLock = null; StopSimulation(); } }
 
         private void Awake()
         {
@@ -72,6 +81,7 @@ namespace EEGWheelchairSimulator
 
         public void StartSimulation()
         {
+            if (MovementLocked) return;
             var free=followCamera?followCamera.GetComponent<DemoFreeCamera>():null;if(free)free.ExitFreeView();
             if (!isActiveAndEnabled || !CaptureInitialPose())
                 return;
