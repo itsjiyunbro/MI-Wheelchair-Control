@@ -21,7 +21,7 @@ namespace EEGWheelchairSimulator
         [SerializeField] CameraFollow follow;
         [SerializeField] GameObject panel;
         [SerializeField] Text status;
-        [SerializeField] Button basementButton,firstButton,openButton,closeButton;
+        [SerializeField] Button basementButton,firstButton,secondButton,thirdButton,openButton,closeButton;
         [SerializeField] Image curtain;
         [SerializeField] string liftName;
         WheelchairCollisionGuard guard;
@@ -36,8 +36,8 @@ namespace EEGWheelchairSimulator
         public bool Busy=>State!=Phase.Idle;
         public Stop[] Stops=>stops;
         public void Configure(string name,Stop[] stations,SimulationController sim,WheelchairMovement actor,CameraFollow camera,
-            GameObject controls,Text label,Button b,Button f,Button o,Button c,Image fade)
-        {liftName=name;stops=stations;simulation=sim;chair=actor;follow=camera;panel=controls;status=label;basementButton=b;firstButton=f;openButton=o;closeButton=c;curtain=fade;}
+            GameObject controls,Text label,Button b,Button f,Button o,Button c,Image fade,Button s=null,Button t=null)
+        {liftName=name;stops=stations;simulation=sim;chair=actor;follow=camera;panel=controls;status=label;basementButton=b;firstButton=f;secondButton=s;thirdButton=t;openButton=o;closeButton=c;curtain=fade;}
         void Awake(){guard=chair.GetComponent<WheelchairCollisionGuard>();simulation.SimulationReset+=ResetJourney;}
         void OnDestroy(){if(simulation)simulation.SimulationReset-=ResetJourney;}
         void OnDisable(){if(Busy)Release();if(panel)panel.SetActive(false);}
@@ -64,6 +64,8 @@ namespace EEGWheelchairSimulator
         void Tell(string message){notice=message;noticeUntil=Time.unscaledTime+3;}
         public void GoToBasement()=>RequestFloor(0);
         public void GoToFirstFloor()=>RequestFloor(1);
+        public void GoToSecondFloor()=>RequestFloor(2);
+        public void GoToThirdFloor()=>RequestFloor(3);
         public void OpenDoors(){int i=Nearby();if(!Busy&&!simulation.MovementLocked&&i>=0)stops[i].door.SetOpen(true);}
         public void CloseDoors(){int i=Nearby();if(!Busy&&!simulation.MovementLocked&&i>=0)stops[i].door.SetOpen(false);}
         public bool RequestFloor(int floor)
@@ -117,16 +119,23 @@ namespace EEGWheelchairSimulator
         void SetFade(float alpha){if(curtain){curtain.color=new Color(0,0,0,alpha);curtain.gameObject.SetActive(alpha>0);}}
         void Release(){foreach(var s in stops)s.door.enabled=true;SetFade(0);State=Phase.Idle;simulation.UnlockMovement(this);}
         void ResetJourney(){foreach(var s in stops)s.door.ResetDoor();Release();notice=null;noticeUntil=0;}
+        static string FloorName(int floor)=>floor==0?"B1":floor+"F";
+        static string IndicatorCode(int floor)=>floor==0?"B1":floor.ToString();
         void RefreshControls()
         {
             near=Nearby();var free=follow.GetComponent<DemoFreeCamera>();bool show=Busy||(near>=0&&!(free&&free.IsFreeView));panel.SetActive(show);if(!show)return;
             bool inside=near>=0&&FullyInside(near);bool usable=!Busy&&!simulation.MovementLocked;
-            basementButton.interactable=usable&&inside;firstButton.interactable=usable&&inside;openButton.interactable=closeButton.interactable=usable;
-            string floor=near==1?"1F":"B1";
+            if(basementButton)basementButton.interactable=usable&&inside;
+            if(firstButton)firstButton.interactable=usable&&inside;
+            if(secondButton)secondButton.interactable=usable&&inside&&stops.Length>2;
+            if(thirdButton)thirdButton.interactable=usable&&inside&&stops.Length>3;
+            openButton.interactable=closeButton.interactable=usable;
+            int shown=near>=0?near:(Busy?destination:0);
+            string floor=FloorName(shown);
             string message=Busy?(State==Phase.Closing?"문이 닫힙니다":State==Phase.Travelling?"층 이동 중": "문이 열립니다"):
                 Time.unscaledTime<noticeUntil?notice:inside?"이동할 층을 선택하세요":"문 열기 → 탑승 → 층 선택";
             status.text=liftName+" · "+floor+"\n"+message;
-            foreach(var s in stops)if(s.indicator)s.indicator.text=Busy?(destination==1?"↑ 1":"↓ B1"):(s==stops[1]?"1":"B1");
+            for(int i=0;i<stops.Length;i++)if(stops[i].indicator)stops[i].indicator.text=Busy?((destination>=source?"↑ ":"↓ ")+IndicatorCode(destination)):IndicatorCode(i);
         }
     }
 }

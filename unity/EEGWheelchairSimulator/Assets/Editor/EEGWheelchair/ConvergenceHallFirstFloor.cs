@@ -735,6 +735,7 @@ namespace EEGWheelchairSimulator.Editor
             ConvergenceHallFirstFloorRepairs.RemoveOverlaps(b1,instance);
             PrefabUtility.SaveAsPrefabAsset(instance,Prefab);
             ValidateGeometry(instance,b1);
+            ConvergenceHallUpperFloors.ReconnectIfPresent();
             var movement=UnityEngine.Object.FindFirstObjectByType<WheelchairMovement>();
             var basementSpawn=ConvergenceHallB1Setup.Plan(745,830,.5f);
             movement.transform.SetPositionAndRotation(basementSpawn,Quaternion.identity);UnityEngine.Object.FindFirstObjectByType<CameraFollow>().SnapToTarget();
