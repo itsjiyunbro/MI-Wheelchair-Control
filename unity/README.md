@@ -1,8 +1,8 @@
 # Unity - 컨버전스홀 B1·1F 휠체어 시뮬레이터
 
-`unity`에서 분기한 `unity-convergence-hall-1` 작업 브랜치입니다.
+`unity`의 B1·1F 구현을 바탕으로 EEG 연동을 추가한 `unity-eeg-inference-demo` 작업 브랜치입니다.
 
-컨버전스홀 지하 1층과 1층을 안내도와 현장 사진 기준으로 구현했습니다. 두 층은 동·서 엘리베이터와 계단실로 이어집니다. 실제 EEG 모델 연결 전 단계이며 키보드와 Python 테스트 송신기로 주행·통신을 확인할 수 있습니다.
+컨버전스홀 지하 1층과 1층을 안내도와 현장 사진 기준으로 구현했습니다. 두 층은 동·서 엘리베이터와 계단실로 이어집니다. 키보드와 Python 테스트 송신기를 지원하며, 학습된 모델의 저장 EEG 예측을 TCP로 받아 회전·정지를 재생할 수 있습니다.
 
 ![B112 강의실](images/convergence-b112.png)
 ![라운지](images/convergence-lounge.png)
@@ -10,7 +10,7 @@
 ## 처음 실행하기
 
 ```powershell
-git clone --branch unity-convergence-hall-1 --single-branch https://github.com/itsjiyunbro/MI-Wheelchair-Control.git
+git clone --branch unity-eeg-inference-demo --single-branch https://github.com/itsjiyunbro/MI-Wheelchair-Control.git
 ```
 
 1. Windows에서는 `C:\Projects`처럼 짧은 경로에 복제하세요. 경로가 길면 Unity 패키지 임포트가 실패할 수 있습니다. Unity Hub에서 **Unity 6000.3.24f1**을 준비합니다.
@@ -72,6 +72,30 @@ python unity/EEGWheelchairSimulator/Tools/PythonTestSender/send_eeg_predictions.
 
 기본 샘플은 EEGNet에서 제자리 좌회전 → 정지 → 제자리 우회전을 차례로 재생합니다. 송신기는 각 예측을 1초씩 적용한 후 연결을 종료합니다. 재생 간격은 `--interval`로 설정하고, `--` 뒤에 `predict.py` 옵션을 전달할 수 있습니다. 예를 들어 `--interval 1.5 -- --model eegnet --threshold 0.90`을 붙일 수 있습니다. 이 데모는 따로 선별된 EEG 윈도 3개의 저장 데이터 재생입니다. 데이터 형식과 모델 옵션은 [팀 추론 코드 안내](evaluate/README.md)를 참고하세요.
 
+기록 순서가 있는 EEG와 윈도 CSV를 받았다면 두 파일을 함께 지정합니다.
+
+```powershell
+python unity/EEGWheelchairSimulator/Tools/PythonTestSender/send_eeg_predictions.py --windows-csv '<windows.csv 경로>' -- --input '<eeg.npy 경로>'
+```
+
+`EEG_Index`는 NPY 배열의 0부터 시작하는 윈도 순서와 일치해야 합니다. 같은 `Trial` 안에서는 `End_sec_from_event`의 차이만큼 각 예측을 적용합니다. 구간 마지막 예측은 기본 0.25초 적용하고 구간 사이에는 `STOP`을 기본 0.25초 넣습니다. 실제 구간 사이 간격이 없는 CSV에 적용하는 재생 설정이며, 각각 `--interval`, `--trial-gap`으로 바꿀 수 있습니다. CSV의 정답 라벨은 회전 명령 생성에 쓰이지 않습니다.
+
+Trial 시작 시간표까지 받았다면 **아래 방식을 사용하세요.** 윈도가 제외된 구간의 시간도 보존합니다.
+
+```powershell
+python unity/EEGWheelchairSimulator/Tools/PythonTestSender/send_eeg_predictions.py --windows-csv '<S009R08_windows.csv 경로>' --trial-onsets-csv '<S009R08_trial_onsets.csv 경로>' -- --input '<S009R08_eeg.npy 경로>' --model eegnet --threshold 0.90
+```
+
+`Trial` 번호로 두 CSV를 연결하고 `Onset_sample_from_run_start / Sampling_rate_Hz + End_sec_from_event` 시점에 예측을 적용합니다. 시간표의 초·샘플 인덱스가 서로 맞는지, 샘플링 주파수가 160 Hz인지 확인합니다. 기록 시작부터 첫 윈도 끝까지는 정지합니다. 예측은 최대 `--interval`(기본 0.25초) 동안 유지하고 다음 예측이 없으면 `STOP`을 보냅니다. 따라서 Trial 2·16뿐 아니라 전처리로 빠진 윈도 사이에서도 이전 회전이 지속되지 않습니다. 이 모드에서는 `--trial-gap` 대신 실제 시각 차이를 사용합니다.
+
+추론을 모두 마친 뒤 기록 시작을 0초로 잡아 재생합니다. 누적 지연을 줄이기 위해 단조 시계의 예정 시각에 맞춰 송신합니다. 이는 저장 데이터 재생이며, 실시간 EEG 수집·온라인 추론 지연 측정은 아닙니다. 마지막 윈도 명령이 만료되면 `STOP`을 보내고 0.25초 후 연결을 종료합니다. 원본 녹음 종료 시각은 제공되지 않았으므로 마지막 이후의 녹음 길이는 재현하지 않습니다. 입력 조건과 오분류 내역은 [S009R08 재생 기록](EEGWheelchairSimulator/Docs/EEGReplay-S009R08.md)을 참고하세요.
+
+시간표 검증 테스트는 저장소 루트에서 실행합니다.
+
+```powershell
+python -m unittest discover -s unity/EEGWheelchairSimulator/Tools/PythonTestSender -p test_send_eeg_predictions.py -v
+```
+
 ## Python 테스트 입력
 
 기존 TCP + NDJSON 테스트 입력의 기본 포트는 **5055**, 명령은 **LEFT / RIGHT / FORWARD / STOP**입니다. 키보드 후진은 Python 프로토콜에 새 명령을 추가하지 않습니다. 테스트 송신기의 confidence는 테스트 값이며, 샘플 EEG 송신기의 보류 판단은 위의 모델 추론 단계에서 처리합니다.
@@ -108,4 +132,4 @@ Assets와 `.meta`, Packages, ProjectSettings, Docs, Tools를 포함합니다. Li
   -convergencePreviewFolder '<화면 저장 폴더>' -logFile '<검증 로그 경로>'
 ```
 
-환경은 사진과 안내도에 따른 추정 비율을 포함하며 정밀 실측 모델은 아닙니다. 현재 범위는 B1입니다. 다른 층과 엘리베이터 층간 이동, 파티션 펼침, 전광판·스크린 콘텐츠 재생, 실제 건강 측정과 EEG 추론은 추가 구현 범위입니다.
+환경은 사진과 안내도에 따른 추정 비율을 포함하며 정밀 실측 모델은 아닙니다. B1·1F와 두 층의 이동, 저장 EEG 모델 추론·명령 재생을 포함합니다. 다른 층, 파티션 펼침, 전광판·스크린 콘텐츠 재생, 실제 건강 측정, 실시간 EEG 장치 연결은 추가 구현 범위입니다. 모델 연동 성공은 모델의 분류 성능이나 실제 휠체어 운용 성능 검증을 의미하지 않습니다.
