@@ -1,6 +1,7 @@
 using System;
 using System.Globalization;
 using UnityEngine;
+using Stopwatch = System.Diagnostics.Stopwatch;
 
 namespace EEGWheelchairSimulator
 {
@@ -12,6 +13,8 @@ namespace EEGWheelchairSimulator
         [SerializeField] private SimulationController simulation;
         [SerializeField] private WheelchairMovement movement;
         [SerializeField, Range(1, 65535)] private int port = 5055;
+        [SerializeField, Min(0.1f), Tooltip("Stop Python movement after this many real-time seconds without a valid command.")]
+        private float commandTimeoutSeconds = 2f;
         [SerializeField] private bool logReceivedMessages = true;
 
         [Serializable]
@@ -26,6 +29,7 @@ namespace EEGWheelchairSimulator
 
         private TcpNdjsonListener transport;
         private string activeCommand = "STOP";
+        private long activeCommandReceivedAtTicks;
         private int observedConnection;
         private bool observedConnected, observedListening;
         private string observedWarning;
@@ -63,6 +67,7 @@ namespace EEGWheelchairSimulator
         private void ClearCommand()
         {
             activeCommand = "STOP";
+            activeCommandReceivedAtTicks = 0;
             if (movement != null && movement.ControlSource == WheelchairControlSource.Python)
                 movement.ClearInputState();
         }
@@ -144,10 +149,25 @@ namespace EEGWheelchairSimulator
                         "[TCP v0.2 temporary] command={0}, confidence={1}, timestamp={2:F3}, sequence={3}; simulation={4}",
                         packet.command, packet.confidence, packet.timestamp, LastSequence?.ToString() ?? "- (v0.1)",
                         simulation.IsRunning ? "RUNNING" : "STOPPED (display only)"), this);
-                if (simulation.IsRunning) activeCommand = packet.command;
+                if (simulation.IsRunning)
+                {
+                    activeCommand = packet.command;
+                    activeCommandReceivedAtTicks = message.ReceivedAtTicks;
+                }
             }
             ObserveState(transport.Snapshot);
             if (!simulation.IsRunning || !IsConnected) ClearCommand();
+            if (activeCommand != "STOP")
+            {
+                // Use the socket's local receipt time so a queued command cannot gain a new lifetime.
+                double age = (Stopwatch.GetTimestamp() - activeCommandReceivedAtTicks) / (double)Stopwatch.Frequency;
+                double timeout = Mathf.Max(0.1f, commandTimeoutSeconds);
+                if (age >= timeout)
+                {
+                    ClearCommand();
+                    Debug.LogWarning($"[TCP v0.2 temporary] No valid Python command for {timeout:0.##} s. Movement stopped.", this);
+                }
+            }
             float turn = activeCommand == "LEFT" ? -1f : activeCommand == "RIGHT" ? 1f : 0f;
             movement.ApplyInput(activeCommand == "FORWARD", turn, Time.deltaTime, WheelchairControlSource.Python);
         }

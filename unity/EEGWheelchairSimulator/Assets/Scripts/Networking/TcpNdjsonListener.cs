@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
@@ -17,6 +18,7 @@ namespace EEGWheelchairSimulator
             public string Line;
             public long Epoch;
             public int Connection;
+            public long ReceivedAtTicks;
         }
 
         internal struct State
@@ -122,6 +124,7 @@ namespace EEGWheelchairSimulator
             int count;
             while ((count = stream.Read(buffer, 0, buffer.Length)) > 0)
             {
+                long receivedAtTicks = Stopwatch.GetTimestamp();
                 for (int i = 0; i < count; i++)
                 {
                     if (length == 0) { lock (sync) lineEpoch = state.Epoch; }
@@ -135,7 +138,13 @@ namespace EEGWheelchairSimulator
                             if (stopping) return;
                             if (lineEpoch != state.Epoch || string.IsNullOrWhiteSpace(text)) continue;
                             if (messages.Count >= 128) throw new IOException("NDJSON queue limit exceeded (128 lines).");
-                            messages.Enqueue(new Message { Line = text, Epoch = lineEpoch, Connection = state.Connection });
+                            messages.Enqueue(new Message
+                            {
+                                Line = text,
+                                Epoch = lineEpoch,
+                                Connection = state.Connection,
+                                ReceivedAtTicks = receivedAtTicks
+                            });
                         }
                     }
                     else

@@ -19,6 +19,7 @@ namespace EEGWheelchairSimulator.Editor
     {
         private const string ActiveKey = "EEG.Step07.ValidationActive";
         private const string FinishedKey = "EEG.Step07.ValidationFinished";
+        private const string TimeoutOnlyKey = "EEG.Step07.TimeoutOnly";
         private static IEnumerator checks;
         private static int lastFrame = -1;
         private static Keyboard keyboard;
@@ -35,7 +36,20 @@ namespace EEGWheelchairSimulator.Editor
 
         public static void Begin()
         {
+            Begin(timeoutOnly: false);
+        }
+
+        public static void BeginCommandTimeout()
+        {
             if (!Application.isBatchMode) throw new InvalidOperationException("Validation requires batch mode.");
+            UnityEditor.SceneManagement.EditorSceneManager.OpenScene(ConvergenceHallB1Setup.ScenePath);
+            Begin(timeoutOnly: true);
+        }
+
+        private static void Begin(bool timeoutOnly)
+        {
+            if (!Application.isBatchMode) throw new InvalidOperationException("Validation requires batch mode.");
+            SessionState.SetBool(TimeoutOnlyKey, timeoutOnly);
             SessionState.SetBool(ActiveKey, true);
             SessionState.SetBool(FinishedKey, false);
             SessionState.SetFloat("EEG.Step07.Deadline", (float)EditorApplication.timeSinceStartup + 150f);
@@ -49,7 +63,7 @@ namespace EEGWheelchairSimulator.Editor
             if (state == PlayModeStateChange.EnteredPlayMode && SessionState.GetBool(ActiveKey, false))
             {
                 Application.logMessageReceived += OnLog;
-                checks = RunChecks();
+                checks = SessionState.GetBool(TimeoutOnlyKey, false) ? RunCommandTimeoutChecks() : RunChecks();
                 lastFrame = -1;
             }
             if (state == PlayModeStateChange.EnteredEditMode && SessionState.GetBool(FinishedKey, false))
@@ -61,6 +75,10 @@ namespace EEGWheelchairSimulator.Editor
 
         private static void OnLog(string message, string trace, LogType type)
         {
+            // The headless Editor's search index can log this before the receiver starts.
+            if (SessionState.GetBool(TimeoutOnlyKey, false) && type == LogType.Exception
+                && trace.Contains("UnityEditor.Search.SearchInit.IndexationOnStartup"))
+                return;
             if (type == LogType.Error || type == LogType.Exception || type == LogType.Assert) runtimeError = message;
         }
 
@@ -90,7 +108,8 @@ namespace EEGWheelchairSimulator.Editor
             SessionState.SetBool(FinishedKey, true);
             SessionState.SetInt("EEG.Step07.Result", error == null ? 0 : 1);
             if (error != null) Debug.LogException(error);
-            else Debug.Log("STEP07_PLAY_OK: real Play Mode keyboard input, Input System pointer clicks, stop gate, reset, HUD/buttons and camera passed.");
+            else if (!SessionState.GetBool(TimeoutOnlyKey, false))
+                Debug.Log("STEP07_PLAY_OK: real Play Mode keyboard input, Input System pointer clicks, stop gate, reset, HUD/buttons and camera passed.");
             EditorApplication.ExitPlaymode();
         }
 
@@ -454,6 +473,8 @@ namespace EEGWheelchairSimulator.Editor
             Check(receiver.IsConnected && receiver.ReceivedCount == count && receiver.CurrentCommand == "RIGHT"
                 && Label("PredictionText") == "PREDICTION: RIGHT" && Label("ConfidenceText") == "CONFIDENCE: 0.0%",
                 "Invalid message changed prediction or movement command.");
+            foreach (var item in CommandTimeoutChecks(simulation, movement, receiver)) yield return item;
+            count = receiver.ReceivedCount;
             WriteWire("{\"command\":\"STOP\",\"confidence\":1,\"timestamp\":3,\"sequence\":13}\n");
             foreach (var item in WaitFor(() => receiver.ReceivedCount > count, "Receiver stopped after invalid messages")) yield return item;
             for (int i = 0; i < 3; i++) yield return null;
@@ -466,6 +487,75 @@ namespace EEGWheelchairSimulator.Editor
             Check(!receiver.HasPrediction && Label("ConnectionText") == "CONNECTION: -" && Label("PredictionText") == "PREDICTION: -"
                 && Label("ConfidenceText") == "CONFIDENCE: -", "Keyboard mode retained Python HUD data.");
             Debug.Log("STEP07_PREDICTION_OK: real Python stream, STOPPED display/blocked movement, new-only START, disconnect/reconnect clearing, v0.1/v0.2, metadata, invalid messages and confidence boundaries.");
+        }
+
+        private static System.Collections.Generic.IEnumerable<object> CommandTimeoutChecks(
+            SimulationController simulation, WheelchairMovement movement, PythonWheelchairReceiver receiver)
+        {
+            const string right = "{\"command\":\"RIGHT\",\"confidence\":0.9,\"timestamp\":4102444800}\n";
+            const string forward = "{\"command\":\"FORWARD\",\"confidence\":0.9,\"timestamp\":1}\n";
+            int count = receiver.ReceivedCount;
+            WriteWire(right);
+            foreach (var item in WaitFor(() => receiver.ReceivedCount > count, "Timed command was not received")) yield return item;
+            Check(receiver.CurrentCommand == "RIGHT" && movement.TurnInput > 0, "Fresh command did not turn before timeout.");
+            double started = EditorApplication.timeSinceStartup;
+            float previousTimeScale = Time.timeScale;
+            try
+            {
+                Time.timeScale = 0f;
+                foreach (var item in WaitFor(() => EditorApplication.timeSinceStartup >= started + 1.4,
+                    "Real-time clock did not advance")) yield return item;
+                Check(receiver.CurrentCommand == "RIGHT", "Command expired early.");
+                count = receiver.ReceivedCount;
+                WriteWire("{\"command\":\"INVALID\",\"confidence\":1,\"timestamp\":1}\n");
+                foreach (var item in WaitFor(() => receiver.CurrentCommand == "STOP",
+                    "Silent connection did not stop movement")) yield return item;
+                Check(EditorApplication.timeSinceStartup - started < 3.2 && receiver.ReceivedCount == count,
+                    "Invalid command refreshed the timeout.");
+                Check(receiver.IsConnected && simulation.IsRunning && movement.TurnInput == 0,
+                    "Timeout did not clear rotation while keeping the connection and simulation active.");
+            }
+            finally { Time.timeScale = previousTimeScale; }
+
+            Vector3 stoppedPosition = movement.transform.position;
+            Quaternion stoppedRotation = movement.transform.rotation;
+            for (int i = 0; i < 8; i++) yield return null;
+            CheckPose(movement.transform, stoppedPosition, stoppedRotation, "Expired command resumed when time scale was restored.");
+
+            // Let a command age on the socket queue while the main thread is stalled.
+            count = receiver.ReceivedCount;
+            WriteWire(right);
+            System.Threading.Thread.Sleep(2400);
+            foreach (var item in WaitFor(() => receiver.ReceivedCount > count, "Queued command was not received")) yield return item;
+            Check(receiver.CurrentCommand == "STOP", "Old queued command resumed movement.");
+            CheckPose(movement.transform, stoppedPosition, stoppedRotation, "Old queued command changed the wheelchair pose.");
+
+            WriteWire(forward);
+            foreach (var item in WaitFor(() => receiver.CurrentCommand == "FORWARD" && movement.IsMoving,
+                "Fresh command did not resume movement on the same connection")) yield return item;
+            foreach (var item in WaitFor(() => receiver.CurrentCommand == "STOP", "Forward command did not expire")) yield return item;
+            Check(receiver.IsConnected && !movement.IsMoving, "Timeout did not clear forward motion.");
+            stoppedPosition = movement.transform.position;
+            stoppedRotation = movement.transform.rotation;
+            for (int i = 0; i < 8; i++) yield return null;
+            CheckPose(movement.transform, stoppedPosition, stoppedRotation, "Wheelchair moved after the forward command expired.");
+            Debug.Log("PYTHON_COMMAND_TIMEOUT_OK: rotation and forward stop, real-time expiry, malformed and queued packets, same-connection recovery.");
+        }
+
+        private static IEnumerator RunCommandTimeoutChecks()
+        {
+            var simulation = UnityEngine.Object.FindFirstObjectByType<SimulationController>();
+            var receiver = UnityEngine.Object.FindFirstObjectByType<PythonWheelchairReceiver>();
+            var movement = receiver.GetComponent<WheelchairMovement>();
+            simulation.SetControlSource(WheelchairControlSource.Python);
+            simulation.StartSimulation();
+            foreach (var item in WaitFor(() => receiver.IsListening, "Timeout test listener did not start")) yield return item;
+            wire = new System.Net.Sockets.TcpClient();
+            var connection = wire.ConnectAsync("127.0.0.1", 5055);
+            foreach (var item in WaitFor(() => connection.IsCompleted && receiver.IsConnected,
+                "Timeout test client could not connect")) yield return item;
+            foreach (var item in CommandTimeoutChecks(simulation, movement, receiver)) yield return item;
+            Check(runtimeError == null, "Unexpected runtime error: " + runtimeError);
         }
 
         private static void Keys(params Key[] keys)

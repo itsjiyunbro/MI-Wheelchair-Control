@@ -98,6 +98,10 @@ python -m unittest discover -s unity/EEGWheelchairSimulator/Tools/PythonTestSend
 
 ## Python 테스트 입력
 
+Python 모드에서 마지막 유효 명령을 받은 뒤 **2초** 동안 새 유효 명령이 없으면 휠체어가 자동으로 정지합니다. TCP 연결과 RUNNING 상태는 유지되며, 이후 새 유효 명령을 받으면 다시 움직입니다. 시간은 Unity가 명령을 받은 시점부터 계산하므로 잘못된 메시지는 제한 시간을 갱신하지 않습니다.
+
+Inspector의 `Python Wheelchair Receiver → Command Timeout Seconds`에서 제한 시간을 조정할 수 있습니다. 움직이는 동안 명령 전송 간격은 이 값보다 짧게 설정하세요. Unity 배치 모드에서 `-executeMethod EEGWheelchairSimulator.Editor.Step07PredictionValidation.BeginCommandTimeout`을 실행하면 B1 장면에서 자동 정지를 검증합니다.
+
 기존 TCP + NDJSON 테스트 입력의 기본 포트는 **5055**, 명령은 **LEFT / RIGHT / FORWARD / STOP**입니다. 키보드 후진은 Python 프로토콜에 새 명령을 추가하지 않습니다. 테스트 송신기의 confidence는 테스트 값이며, 샘플 EEG 송신기의 보류 판단은 위의 모델 추론 단계에서 처리합니다.
 
 ```powershell
