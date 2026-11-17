@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using UnityEditor;
 using UnityEditor.Events;
@@ -12,7 +14,7 @@ namespace EEGWheelchairSimulator.Editor
 {
     public static class ConvergenceHallUpperFloors
     {
-        [MenuItem("Tools/EEG Wheelchair/Build Convergence Hall 2F")]
+        [MenuItem("Tools/EEG Wheelchair/Build Convergence Hall 2F And 3F")]
         public static void BuildAndValidate()
         {
             if (EditorApplication.isPlayingOrWillChangePlaymode)
@@ -28,6 +30,7 @@ namespace EEGWheelchairSimulator.Editor
             if (!b1 || !first)
                 throw new InvalidOperationException("ConvergenceHallB1 and ConvergenceHall1F must exist in scene first.");
 
+            // Destroy old 2F / 3F instances if rebuilding
             foreach (string oldName in new[] { "ConvergenceHall2F", "ConvergenceHall3F" })
             {
                 var old = GameObject.Find(oldName);
@@ -35,17 +38,23 @@ namespace EEGWheelchairSimulator.Editor
             }
 
             var asset2 = ConvergenceHallSecondFloor.BuildPrefab(b1);
+            var asset3 = ConvergenceHallThirdFloor.BuildPrefab(b1);
 
             Vector3 firstOrigin = first.transform.position;
             var second = (GameObject)PrefabUtility.InstantiatePrefab(asset2);
             second.transform.position = firstOrigin + Vector3.up * Hlp.StoreyRise;
             PrefabUtility.RecordPrefabInstancePropertyModifications(second.transform);
 
-            PrepareFirstFloorConnections(first);
-            ConnectUpperStairs(first, second);
-            ConfigureFloorNavigation(firstOrigin);
-            BuildThreeFloorElevators(b1, first, second);
+            var third = (GameObject)PrefabUtility.InstantiatePrefab(asset3);
+            third.transform.position = firstOrigin + Vector3.up * (Hlp.StoreyRise * 2f);
+            PrefabUtility.RecordPrefabInstancePropertyModifications(third.transform);
 
+            PrepareFirstFloorConnections(first);
+            ConnectUpperStairs(first, second, third);
+            ConfigureAllFloorNavigation(firstOrigin);
+            BuildFourFloorElevators(b1, first, second, third);
+
+            // Reset wheelchair to B1 default start
             var movement = UnityEngine.Object.FindFirstObjectByType<WheelchairMovement>();
             var basementSpawn = ConvergenceHallB1Setup.Plan(745, 830, .5f);
             movement.transform.SetPositionAndRotation(basementSpawn, Quaternion.identity);
@@ -57,7 +66,7 @@ namespace EEGWheelchairSimulator.Editor
             EditorSceneManager.SaveScene(scene, ConvergenceHallFirstFloor.Scene, true);
             AssetDatabase.SaveAssets();
 
-            Debug.Log("SECOND_FLOOR_BUILT: 2F (201-219, 203-1, containers, lounge, services) connected to B1/1F.");
+            Debug.Log("UPPER_FLOORS_BUILT: 2F (201-219, 203-1, containers, lounge, services) and 3F (301-323, auditorium 318, project rooms) connected to B1/1F.");
             ConvergenceHallUpperFloorsValidation.BeginChecks();
         }
 
@@ -66,16 +75,18 @@ namespace EEGWheelchairSimulator.Editor
             var b1 = GameObject.Find("ConvergenceHallB1");
             var first = GameObject.Find("ConvergenceHall1F");
             var second = GameObject.Find("ConvergenceHall2F");
-            if (!b1 || !first || !second) return;
+            var third = GameObject.Find("ConvergenceHall3F");
+            if (!b1 || !first || !second || !third) return;
             Hlp.LoadMaterials();
             PrepareFirstFloorConnections(first);
-            ConnectUpperStairs(first, second);
-            ConfigureFloorNavigation(first.transform.position);
-            BuildThreeFloorElevators(b1, first, second);
+            ConnectUpperStairs(first, second, third);
+            ConfigureAllFloorNavigation(first.transform.position);
+            BuildFourFloorElevators(b1, first, second, third);
         }
 
         static void PrepareFirstFloorConnections(GameObject first)
         {
+            // Open 1F stairwell ceilings and UpperBluebell landing back wall in the unified scene
             var upperBack = first.transform.Find("Details/UpperStairBack");
             if (upperBack)
             {
@@ -99,14 +110,24 @@ namespace EEGWheelchairSimulator.Editor
             }
         }
 
-        static void ConnectUpperStairs(GameObject first, GameObject second)
+        static void ConnectUpperStairs(GameObject first, GameObject second, GameObject third)
         {
-            var details = second.transform.Find("Details");
-            foreach (var old in details.Cast<Transform>().Where(t => t.name.EndsWith("ConnectedStair")).ToArray())
-                UnityEngine.Object.DestroyImmediate(old.gameObject);
+            // Remove previous upper stair connectors
+            foreach (var floor in new[] { second, third })
+            {
+                var details = floor.transform.Find("Details");
+                foreach (var old in details.Cast<Transform>().Where(t => t.name.EndsWith("ConnectedStair") || t.name == "Open2F3FStair").ToArray())
+                    UnityEngine.Object.DestroyImmediate(old.gameObject);
+            }
 
+            // 1F -> 2F & 2F -> 3F North & South Core Stairwells
             ConnectCoreStairRun(first, second, "1F2F_NorthConnectedStair", east: true);
+            ConnectCoreStairRun(second, third, "2F3F_NorthConnectedStair", east: true);
             ConnectCoreStairRun(first, second, "1F2F_SouthConnectedStair", east: false);
+            ConnectCoreStairRun(second, third, "2F3F_SouthConnectedStair", east: false);
+
+            // 2F -> 3F Open Switchback Stair (photos 04 & 09)
+            BuildOpenSwitchback2F3F(second, third);
         }
 
         static void ConnectCoreStairRun(GameObject lowerFloor, GameObject upperFloor, string name, bool east)
@@ -152,6 +173,7 @@ namespace EEGWheelchairSimulator.Editor
             var slab = Hlp.Box(connected, "ReturnSupport", (slabBottom + slabTop) / 2f, new Vector3(laneWidth, .15f, Vector3.Distance(slabBottom, slabTop)), Hlp.stairTile);
             slab.localRotation = Quaternion.LookRotation(slabTop - slabBottom);
 
+            // Lower & Upper landing slabs bridging door thresholds
             Surface("LowerApproach", new Vector3(0, -.09f, start / 2f), new Vector3(width, .18f, start));
             Surface("UpperLanding", new Vector3(upperX, Hlp.StoreyRise - .09f, start / 2f), new Vector3(laneWidth, .18f, start));
             Surface("UpperBridge", new Vector3(0, Hlp.StoreyRise - .09f, .16f), new Vector3(width, .18f, .32f));
@@ -186,7 +208,67 @@ namespace EEGWheelchairSimulator.Editor
             connected.gameObject.AddComponent<StairWalkRoute>().Configure(path, upperDoor);
         }
 
-        static void ConfigureFloorNavigation(Vector3 firstOrigin)
+        static void BuildOpenSwitchback2F3F(GameObject second, GameObject third)
+        {
+            var g = P.Group(third.transform.Find("Details"), "Open2F3FStair");
+            g.position = second.transform.TransformPoint(Hlp.At(15.5f, 51.35f));
+            g.rotation = second.transform.rotation * Quaternion.Euler(0, 180f, 0);
+
+            const float width = 3.50f, depth = 4.70f, start = .55f, landingDepth = .95f, mid = Hlp.StoreyRise / 2f;
+            const int count = 11;
+            float turn = depth - landingDepth;
+            float tread = (turn - start) / count;
+            float rise = mid / count;
+            float laneWidth = (width - .16f) / 2f;
+            float lowerX = (laneWidth + .16f) / 2f;
+            float upperX = -lowerX;
+
+            void Surface(string n, Vector3 pos, Vector3 size)
+            {
+                var s = Hlp.Box(g, n, pos, size, Hlp.stairTile);
+                s.gameObject.AddComponent<BoxCollider>();
+            }
+
+            for (int i = 0; i < count; i++)
+            {
+                float lh = (i + 1) * rise;
+                float lz = start + (i + .5f) * tread;
+                Surface("LowerTread" + i, new Vector3(lowerX, lh / 2f, lz), new Vector3(laneWidth, lh, tread));
+                float uh = mid + (i + 1) * rise;
+                float uz = turn - (i + .5f) * tread;
+                Surface("ReturnTread" + i, new Vector3(upperX, uh - rise / 2f, uz), new Vector3(laneWidth, rise, tread));
+            }
+            Surface("MidLanding", new Vector3(0, mid - .075f, turn + landingDepth / 2f), new Vector3(width, .15f, landingDepth));
+            var sb = new Vector3(upperX, mid - .15f, turn);
+            var st = new Vector3(upperX, Hlp.StoreyRise - .15f, start);
+            var slab = Hlp.Box(g, "ReturnSupport", (sb + st) / 2f, new Vector3(laneWidth, .14f, Vector3.Distance(sb, st)), Hlp.stairTile);
+            slab.localRotation = Quaternion.LookRotation(st - sb);
+            Surface("UpperLanding", new Vector3(upperX, Hlp.StoreyRise - .09f, start / 2f), new Vector3(laneWidth, .18f, start));
+
+            // Wheelchair safety guard along 2F bottom & 3F top opening
+            var guard2F = Hlp.Box(g, "WheelchairGuard2F", new Vector3(0, .55f, .10f), new Vector3(width, 1.10f, .06f), Hlp.white, true);
+            guard2F.GetComponent<Renderer>().enabled = false;
+            Hlp.AddStairRail(g, new Vector3(lowerX - laneWidth / 2f + .05f, 0, start), new Vector3(lowerX - laneWidth / 2f + .05f, mid, turn));
+            Hlp.AddStairRail(g, new Vector3(lowerX + laneWidth / 2f - .05f, 0, start), new Vector3(lowerX + laneWidth / 2f - .05f, mid, turn));
+            Hlp.AddStairRail(g, new Vector3(upperX - laneWidth / 2f + .05f, mid, turn), new Vector3(upperX - laneWidth / 2f + .05f, Hlp.StoreyRise, 0));
+            Hlp.AddStairRail(g, new Vector3(upperX + laneWidth / 2f - .05f, mid, turn), new Vector3(upperX + laneWidth / 2f - .05f, Hlp.StoreyRise, 0));
+            Hlp.AddStairRail(g, new Vector3(-width / 2f + .05f, mid, depth - .06f), new Vector3(width / 2f - .05f, mid, depth - .06f));
+
+            var path = new[]
+            {
+                new Vector3(lowerX, 0, -.65f),
+                new Vector3(lowerX, 0, start),
+                new Vector3(lowerX, mid, turn),
+                new Vector3(lowerX, mid, turn + .45f),
+                new Vector3(upperX, mid, turn + .45f),
+                new Vector3(upperX, mid, turn),
+                new Vector3(upperX, Hlp.StoreyRise, start),
+                new Vector3(upperX, Hlp.StoreyRise, -.65f),
+            };
+            g.gameObject.AddComponent<StairWalkRoute>().Configure(path, null);
+        }
+
+        static void ConfigureAllFloorNavigation(Vector3 firstOrigin)
         {
             var movement = UnityEngine.Object.FindFirstObjectByType<WheelchairMovement>();
             var sim = UnityEngine.Object.FindFirstObjectByType<SimulationController>();
@@ -223,7 +305,8 @@ namespace EEGWheelchairSimulator.Editor
             {
                 ("BasementButton", "B1 · PgDn", new Vector2(10, -64), navigation.GoToBasement),
                 ("FirstFloorButton", "1F", new Vector2(134, -64), navigation.GoToFirstFloor),
-                ("SecondFloorButton", "2F · PgUp", new Vector2(10, -110), navigation.GoToSecondFloor),
+                ("SecondFloorButton", "2F", new Vector2(10, -110), navigation.GoToSecondFloor),
+                ("ThirdFloorButton", "3F · PgUp", new Vector2(134, -110), navigation.GoToThirdFloor),
             };
             foreach (var (name, text, pos, action) in specs)
             {
@@ -231,7 +314,7 @@ namespace EEGWheelchairSimulator.Editor
                 t.name = name;
                 t.anchorMin = t.anchorMax = t.pivot = new Vector2(0, 1);
                 t.anchoredPosition = pos;
-                t.sizeDelta = name == "SecondFloorButton" ? new Vector2(240, 38) : new Vector2(116, 38);
+                t.sizeDelta = new Vector2(116, 38);
                 var button = t.GetComponent<Button>();
                 button.onClick = new Button.ButtonClickedEvent();
                 UnityEventTools.AddPersistentListener(button.onClick, action);
@@ -244,7 +327,8 @@ namespace EEGWheelchairSimulator.Editor
             Vector3 b1Spawn = ConvergenceHallB1Setup.Plan(745, 830, .5f);
             Vector3 f1Spawn = firstOrigin + Hlp.At(17, 27, .5f);
             Vector3 f2Spawn = firstOrigin + Vector3.up * Hlp.StoreyRise + Hlp.At(19.5f, 27f, .5f);
-            navigation.ConfigureUpToSecondFloor(sim, movement, follow, label, b1Spawn, f1Spawn, f2Spawn, 0, 90, 90);
+            Vector3 f3Spawn = firstOrigin + Vector3.up * (Hlp.StoreyRise * 2f) + Hlp.At(14.2f, 27f, .5f);
+            navigation.ConfigureAllFloors(sim, movement, follow, label, b1Spawn, f1Spawn, f2Spawn, f3Spawn, 0, 90, 90, 90);
         }
 
         static Text UiText(Transform p, string name, string value, Font font, Vector2 size, Vector2 offset)
@@ -281,7 +365,7 @@ namespace EEGWheelchairSimulator.Editor
             return b;
         }
 
-        static void BuildThreeFloorElevators(GameObject b1, GameObject first, GameObject second)
+        static void BuildFourFloorElevators(GameObject b1, GameObject first, GameObject second, GameObject third)
         {
             var sim = UnityEngine.Object.FindFirstObjectByType<SimulationController>();
             var actor = UnityEngine.Object.FindFirstObjectByType<WheelchairMovement>();
@@ -316,12 +400,14 @@ namespace EEGWheelchairSimulator.Editor
                 string hallPath = east ? "RoomsAndCores/NorthElevatorHall" : "RoomsAndCores/SouthElevatorHall/LeftWallElevator";
                 var s1 = first.transform.Find(hallPath);
                 var s2 = second.transform.Find(hallPath);
+                var s3 = third.transform.Find(hallPath);
 
                 var stops = new[]
                 {
                     new PassengerElevator.Stop { cabin = lower.Find("MeasuredCabin"), door = lower.GetComponent<InteractiveDoor>() },
                     new PassengerElevator.Stop { cabin = s1.Find("MeasuredCabin"), door = s1.GetComponent<InteractiveDoor>(), indicator = s1.Find("PhotoElevatorDetails/PhotoFloorIndicator/FloorNumber").GetComponent<Text>() },
                     new PassengerElevator.Stop { cabin = s2.Find("MeasuredCabin"), door = s2.GetComponent<InteractiveDoor>(), indicator = s2.Find("PhotoElevatorDetails/PhotoFloorIndicator/FloorNumber").GetComponent<Text>() },
+                    new PassengerElevator.Stop { cabin = s3.Find("MeasuredCabin"), door = s3.GetComponent<InteractiveDoor>(), indicator = s3.Find("PhotoElevatorDetails/PhotoFloorIndicator/FloorNumber").GetComponent<Text>() },
                 };
 
                 var panel = new GameObject(east ? "EastControls" : "WestControls", typeof(RectTransform), typeof(Image)).GetComponent<RectTransform>();
@@ -335,6 +421,7 @@ namespace EEGWheelchairSimulator.Editor
                 var b = UiButton(panel, template, "B1", "B1 · 지하 1층", new Vector2(12, -70), lift.GoToBasement);
                 var f1 = UiButton(panel, template, "1F", "1F · 1층", new Vector2(169, -70), lift.GoToFirstFloor);
                 var f2 = UiButton(panel, template, "2F", "2F · 2층", new Vector2(12, -112), lift.GoToSecondFloor);
+                var f3 = UiButton(panel, template, "3F", "3F · 3층", new Vector2(169, -112), lift.GoToThirdFloor);
                 var o = UiButton(panel, template, "Open", "문 열기 / 호출", new Vector2(12, -154), lift.OpenDoors);
                 var c = UiButton(panel, template, "Close", "문 닫기", new Vector2(169, -154), lift.CloseDoors);
 
@@ -356,7 +443,7 @@ namespace EEGWheelchairSimulator.Editor
                 fade.SetActive(false);
                 panel.gameObject.SetActive(false);
 
-                lift.Configure(name, stops, sim, actor, follow, panel.gameObject, label, b, f1, o, c, image, f2, null);
+                lift.Configure(name, stops, sim, actor, follow, panel.gameObject, label, b, f1, o, c, image, f2, f3);
 
                 var metal = s1.Find("CallPanel").GetComponent<Renderer>().sharedMaterial;
                 var dark = s1.Find("FloorDisplayBacking").GetComponent<Renderer>().sharedMaterial;
@@ -367,9 +454,9 @@ namespace EEGWheelchairSimulator.Editor
                     var p = P.Group(stop.cabin, "PassengerControlPanel");
                     p.localPosition = new Vector3(.75f, 1.13f, .65f);
                     p.localRotation = Quaternion.Euler(0, 90, 0);
-                    P.Box(p, "Plate", Vector3.zero, new Vector3(.2f, .46f, .02f), metal);
-                    for (int i = 0; i < 3; i++)
-                        P.Box(p, "Button" + i, new Vector3(0, (i - 1) * .11f, -.016f), new Vector3(.065f, .065f, .014f), dark);
+                    P.Box(p, "Plate", Vector3.zero, new Vector3(.2f, .56f, .02f), metal);
+                    for (int i = 0; i < 4; i++)
+                        P.Box(p, "Button" + i, new Vector3(0, i * .11f - .165f, -.016f), new Vector3(.065f, .065f, .014f), dark);
                 }
             }
         }
