@@ -131,9 +131,9 @@ namespace EEGWheelchairSimulator.Editor
             Hlp.Room(architecture, roofs, "2F", "기계실", new Hlp.R(27, 34, 42, 40), "u0", "기계실", "Mechanical Room", doorOffset: 1.0f);
 
             // North-West wing (202, 203, 203-1, West WC)
-            Hlp.TeachingRoom(architecture, roofs, details, "2F", "202", new Hlp.R(0, 41, 8, 49), "u1", glazed: true);
-            Hlp.TeachingRoom(architecture, roofs, details, "2F", "203", new Hlp.R(0, 50, 8, 59.4f), "u1", doubleDoor: true);
-            Hlp.Room(architecture, roofs, "2F", "203-1", new Hlp.R(8.4f, 59.4f, 14.5f, 66), "v0");
+            Hlp.TeachingRoom(architecture, roofs, details, "2F", "202", new Hlp.R(0, 41, 8, 49), "u1", "학생창업보육실", "SW Startups Incubator", glazed: true);
+            Hlp.TeachingRoom(architecture, roofs, details, "2F", "203", new Hlp.R(0, 50, 8, 59.4f), "u1", "피지컬AI프로젝트실", "Physical AI Project Room", glazed: true);
+            Hlp.Room(architecture, roofs, "2F", "203-1", new Hlp.R(8.4f, 59.4f, 14.5f, 66), "v0", "의료AI프로젝트실", "Healthcare AI Project Room");
             Hlp.Room(architecture, roofs, "2F", "WC-W-W", new Hlp.R(14.5f, 59.4f, 19, 66), "v0", "여자 화장실", "Women");
             Hlp.Room(architecture, roofs, "2F", "WC-W-M", new Hlp.R(19, 59.4f, 23.5f, 66), "v0", "남자 화장실", "Men");
 
