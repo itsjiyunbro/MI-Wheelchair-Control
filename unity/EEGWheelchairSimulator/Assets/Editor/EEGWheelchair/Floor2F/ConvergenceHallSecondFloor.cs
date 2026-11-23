@@ -115,12 +115,13 @@ namespace EEGWheelchairSimulator.Editor
             Hlp.TeachingRoom(architecture, roofs, details, "2F", "219", new Hlp.R(0, 0, 6, 5), "u1");
             Hlp.TeachingRoom(architecture, roofs, details, "2F", "218", new Hlp.R(0, 5, 6, 10), "u1");
             Hlp.TeachingRoom(architecture, roofs, details, "2F", "217", new Hlp.R(0, 10, 6, 15), "u1");
-            Hlp.TeachingRoom(architecture, roofs, details, "2F", "216", new Hlp.R(0, 15, 6.5f, 21), "v1", glazed: true);
+            Hlp.Room(architecture, roofs, "2F", "216", new Hlp.R(0, 15, 6.5f, 21), "v1", "서버실", "Server Room");
             Hlp.TeachingRoom(architecture, roofs, details, "2F", "215", new Hlp.R(6, 0, 14, 15), "v1", glazed: true, doubleDoor: true);
             Hlp.TeachingRoom(architecture, roofs, details, "2F", "214", new Hlp.R(14, 0, 20, 5), "u1");
             Hlp.TeachingRoom(architecture, roofs, details, "2F", "213", new Hlp.R(14, 5, 20, 10), "u1");
-            Hlp.TeachingRoom(architecture, roofs, details, "2F", "212", new Hlp.R(14, 10, 20, 15), "u1");
-            Hlp.TeachingRoom(architecture, roofs, details, "2F", "210", new Hlp.R(22, 0, 27, 5), "u0");
+            var r212 = Hlp.Room(architecture, roofs, "2F", "212", new Hlp.R(14, 10, 20, 15), "u1", "RC융합대학", "RC Convergence College");
+            UnityEngine.Object.DestroyImmediate(r212.Find("U1/Door_212").GetComponent<InteractiveDoor>()); // 출입 제한: 문 개폐 비활성화 및 충돌 유지
+            Hlp.Room(architecture, roofs, "2F", "210", new Hlp.R(22, 0, 27, 5), "u0", "서버실", "Server Room");
             Hlp.Room(architecture, roofs, "2F", "WC-E-M", new Hlp.R(22, 5, 27, 9), "u0", "남자 화장실", "Men");
             Hlp.Room(architecture, roofs, "2F", "WC-E-W", new Hlp.R(22, 9, 27, 13), "u0", "여자 화장실", "Women");
 
