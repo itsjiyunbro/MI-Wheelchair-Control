@@ -115,7 +115,7 @@ namespace EEGWheelchairSimulator.Editor
             Require(b1 && f1 && f2 && f3, "Missing one of B1/1F/2F/3F root objects");
 
             ValidateFloorGeometry(f2, new[] { "202", "203", "203-1", "204", "205", "206", "207", "208", "209", "210", "212", "213", "214", "215", "216", "217", "218", "219" }, "2F");
-            ValidateFloorGeometry(f3, new[] { "301", "302", "303", "304", "305", "306", "307", "308", "309", "310", "311", "312", "313", "314", "315", "316", "318", "319", "320", "321", "322", "323" }, "3F");
+            ValidateFloorGeometry(f3, new[] { "301", "302", "303", "304", "305", "306", "307", "308", "309", "310", "311", "312", "313", "314", "315", "316", "318-1", "318-2", "319", "320", "321", "322", "323" }, "3F");
             Require(f2.transform.Find("Details/Containers201/201_Gray"), "Missing 201 container");
 
             var sim = UnityEngine.Object.FindFirstObjectByType<SimulationController>();

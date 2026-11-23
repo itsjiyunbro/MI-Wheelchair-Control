@@ -119,19 +119,20 @@ namespace EEGWheelchairSimulator.Editor
             Hlp.Room(architecture, roofs, "3F", "WC-E-M", new Hlp.R(9, 12, 16, 17), "u0", "남자 화장실", "Men");
             Hlp.TeachingRoom(architecture, roofs, details, "3F", "323", new Hlp.R(20, 0, 37, 17), "v1", "강의실", "Lecture Room", doubleDoor: true);
 
-            // Center 318 & 301..305 Lecture Rooms
-            Hlp.TeachingRoom(architecture, roofs, details, "3F", "318", new Hlp.R(0, 28.5f, 12.5f, 38.5f), "u1", "강의실", "Lecture Room", doubleDoor: true);
-            Hlp.TeachingRoom(architecture, roofs, details, "3F", "301", new Hlp.R(16, 26, 21, 30), "u0", "강의실", "Lecture Room", glazed: true);
+            // Center 318-1 (Void side, 2 single doors) & 318-2 (Exit side, 1 single + 1 double door) + 301..305
+            BuildSplit318("318-2", 28.5f, 33.5f, x0: -1.35f, double0: false, x1: 1.30f, double1: true);
+            BuildSplit318("318-1", 33.5f, 38.5f, x0: -1.25f, double0: false, x1: 1.35f, double1: false);
+            Hlp.Room(architecture, roofs, "3F", "301", new Hlp.R(16, 26, 21, 30), "u0", "창고", "Storage", glaze: false);
             Hlp.TeachingRoom(architecture, roofs, details, "3F", "302", new Hlp.R(16, 30, 21, 35.5f), "u0", "강의실", "Lecture Room", glazed: true);
-            Hlp.TeachingRoom(architecture, roofs, details, "3F", "303", new Hlp.R(16, 35.5f, 21, 40.5f), "u0", "강의실", "Lecture Room", glazed: true);
-            Hlp.TeachingRoom(architecture, roofs, details, "3F", "304", new Hlp.R(16, 40.5f, 21, 45), "u0", "강의실", "Lecture Room", glazed: true);
-            Hlp.TeachingRoom(architecture, roofs, details, "3F", "305", new Hlp.R(16, 45, 21, 49), "u0", "강의실", "Lecture Room", glazed: true);
+            Hlp.TeachingRoom(architecture, roofs, details, "3F", "303", new Hlp.R(16, 35.5f, 21, 40.5f), "u0", "SW Help Desk", "SW Help Desk", glazed: true);
+            Hlp.TeachingRoom(architecture, roofs, details, "3F", "304", new Hlp.R(16, 40.5f, 21, 45), "u0", "워크샵실", "Workshop Room", glazed: true);
+            Hlp.TeachingRoom(architecture, roofs, details, "3F", "305", new Hlp.R(16, 45, 21, 49), "u0", "프로젝트실", "SW Project Room", glazed: true);
 
-            // North-West wing (316, 315, 314 PC Labs; 313 enclosed utility/core behind solid corridor wall)
+            // North-West wing (316, 315, 314 PC Labs; 313 storage)
             Hlp.TeachingRoom(architecture, roofs, details, "3F", "316", new Hlp.R(0, 46, 12.5f, 49.5f), "u1", "PC실습실", "PC Lab", glazed: true, computers: true);
             Hlp.TeachingRoom(architecture, roofs, details, "3F", "315", new Hlp.R(0, 49.5f, 12.5f, 53.0f), "u1", "PC실습실", "PC Lab", glazed: true, computers: true);
             Hlp.TeachingRoom(architecture, roofs, details, "3F", "314", new Hlp.R(0, 53.0f, 12.5f, 56.5f), "u1", "PC실습실", "PC Lab", glazed: true, computers: true);
-            Hlp.Room(architecture, roofs, "3F", "313", new Hlp.R(8.4f, 59.4f, 13, 66), "v0", "설비실", "Utility Room");
+            Hlp.Room(architecture, roofs, "3F", "313", new Hlp.R(8.4f, 59.4f, 13, 66), "v0", "창고", "Storage");
 
             // West Restrooms & 306..312 Project Rooms (photos 11, 12, 13)
             Hlp.Room(architecture, roofs, "3F", "WC-W-M", new Hlp.R(14, 60.5f, 20, 66), "v0", "남자 화장실", "Men");
@@ -161,13 +162,13 @@ namespace EEGWheelchairSimulator.Editor
             // 2 Vending machines + Recycling station near 318/319 lobby (photo 05 & 06)
             Hlp.AddVendingAndRecycling(basement, details, Hlp.At(18.5f, 18.2f), 90, includeVending: true);
 
-            // Folding exhibition tables outside 318 (photo 05)
-            for (int i = 0; i < 3; i++)
+            // Folding exhibition tables outside 318 (between 318-1 and 318-2 doors, photo 05)
+            foreach (float tv in new[] { 31.2f, 36.0f })
             {
-                var table = Hlp.Face(details, "LobbyTable" + i, Hlp.At(13.1f, 29.5f + i * 2.4f), 0);
-                Hlp.Box(table, "Top", new Vector3(0, .74f, 0), new Vector3(1.8f, .04f, .70f), Hlp.white, true);
+                var table = Hlp.Face(details, "LobbyTable_" + tv, Hlp.At(13.0f, tv), 0);
+                Hlp.Box(table, "Top", new Vector3(0, .74f, 0), new Vector3(1.05f, .04f, .65f), Hlp.white, true);
                 foreach (int sx in new[] { -1, 1 })
-                    Hlp.Box(table, "Leg" + sx, new Vector3(sx * .82f, .37f, 0), new Vector3(.04f, .74f, .60f), Hlp.silver);
+                    Hlp.Box(table, "Leg" + sx, new Vector3(sx * .46f, .37f, 0), new Vector3(.04f, .74f, .55f), Hlp.silver);
             }
 
             // Downlights & fire extinguishers
@@ -177,6 +178,30 @@ namespace EEGWheelchairSimulator.Editor
             Hlp.FireExtinguisher(details, 15.3f, 25.8f);
             Hlp.FireExtinguisher(details, 15.3f, 52.8f);
             Hlp.FireExtinguisher(details, 26.5f, 60.0f);
+        }
+
+        static void BuildSplit318(string code, float v0, float v1, float x0, bool double0, float x1, bool double1)
+        {
+            Hlp.TeachingRoom(architecture, roofs, details, "3F", code, new Hlp.R(0, v0, 12.5f, v1), "u1", "강의실", "Lecture Room");
+            var room = architecture.Find("Room" + code);
+            var oldU1 = room.Find("U1");
+            if (oldU1) UnityEngine.Object.DestroyImmediate(oldU1.gameObject);
+
+            float len = v1 - v0;
+            float w0 = double0 ? 1.7f : 1.0f, h0 = w0 / 2 + .05f;
+            float w1 = double1 ? 1.7f : 1.0f, h1 = w1 / 2 + .05f;
+            var u1 = Hlp.Face(room, "U1", Hlp.At(12.5f, (v0 + v1) / 2), 0);
+            Hlp.Panel(u1, "Left", -len / 2, x0 - h0, false);
+            Hlp.Panel(u1, "Middle", x0 + h0, x1 - h1, false);
+            Hlp.Panel(u1, "Right", x1 + h1, len / 2, false);
+
+            var d0 = P.Group(u1, "Door_" + code + "_A");
+            d0.localPosition = new Vector3(x0, 0, 0);
+            Hlp.Door(d0, "3F", code, "강의실", "Lecture Room", w0);
+
+            var d1 = P.Group(u1, "Door_" + code + "_B");
+            d1.localPosition = new Vector3(x1, 0, 0);
+            Hlp.Door(d1, "3F", code, "강의실", "Lecture Room", w1);
         }
     }
 }
