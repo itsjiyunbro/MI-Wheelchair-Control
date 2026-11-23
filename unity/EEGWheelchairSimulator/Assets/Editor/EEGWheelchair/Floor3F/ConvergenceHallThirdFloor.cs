@@ -111,21 +111,21 @@ namespace EEGWheelchairSimulator.Editor
         static void Rooms(GameObject basement)
         {
             // East wing (319..323, WC-E)
-            Hlp.TeachingRoom(architecture, roofs, details, "3F", "320", new Hlp.R(0, 0, 6, 6), "u1");
-            Hlp.TeachingRoom(architecture, roofs, details, "3F", "319", new Hlp.R(0, 6, 6, 12), "u1");
+            Hlp.TeachingRoom(architecture, roofs, details, "3F", "320", new Hlp.R(0, 0, 6, 6), "u1", "강의실", "Lecture Room");
+            Hlp.TeachingRoom(architecture, roofs, details, "3F", "319", new Hlp.R(0, 6, 6, 12), "u1", "강의실", "Lecture Room");
             Hlp.Room(architecture, roofs, "3F", "WC-E-W", new Hlp.R(0, 12, 6, 17), "u1", "여자 화장실", "Women");
-            Hlp.TeachingRoom(architecture, roofs, details, "3F", "322", new Hlp.R(9, 0, 16, 6), "u0");
-            Hlp.TeachingRoom(architecture, roofs, details, "3F", "321", new Hlp.R(9, 6, 16, 12), "u0");
+            Hlp.TeachingRoom(architecture, roofs, details, "3F", "322", new Hlp.R(9, 0, 16, 6), "u0", "강의실", "Lecture Room");
+            Hlp.TeachingRoom(architecture, roofs, details, "3F", "321", new Hlp.R(9, 6, 16, 12), "u0", "강의실", "Lecture Room");
             Hlp.Room(architecture, roofs, "3F", "WC-E-M", new Hlp.R(9, 12, 16, 17), "u0", "남자 화장실", "Men");
-            Hlp.TeachingRoom(architecture, roofs, details, "3F", "323", new Hlp.R(20, 0, 37, 17), "v1", doubleDoor: true);
+            Hlp.TeachingRoom(architecture, roofs, details, "3F", "323", new Hlp.R(20, 0, 37, 17), "v1", "강의실", "Lecture Room", doubleDoor: true);
 
-            // Center 318 Auditorium & 301..305
-            Hlp.TeachingRoom(architecture, roofs, details, "3F", "318", new Hlp.R(0, 28.5f, 12.5f, 38.5f), "u1", "대형강의실", "Auditorium", doubleDoor: true);
-            Hlp.TeachingRoom(architecture, roofs, details, "3F", "301", new Hlp.R(16, 26, 21, 30), "u0", glazed: true);
-            Hlp.TeachingRoom(architecture, roofs, details, "3F", "302", new Hlp.R(16, 30, 21, 35.5f), "u0", glazed: true);
-            Hlp.TeachingRoom(architecture, roofs, details, "3F", "303", new Hlp.R(16, 35.5f, 21, 40.5f), "u0", glazed: true);
-            Hlp.TeachingRoom(architecture, roofs, details, "3F", "304", new Hlp.R(16, 40.5f, 21, 45), "u0", glazed: true);
-            Hlp.TeachingRoom(architecture, roofs, details, "3F", "305", new Hlp.R(16, 45, 21, 49), "u0", glazed: true);
+            // Center 318 & 301..305 Lecture Rooms
+            Hlp.TeachingRoom(architecture, roofs, details, "3F", "318", new Hlp.R(0, 28.5f, 12.5f, 38.5f), "u1", "강의실", "Lecture Room", doubleDoor: true);
+            Hlp.TeachingRoom(architecture, roofs, details, "3F", "301", new Hlp.R(16, 26, 21, 30), "u0", "강의실", "Lecture Room", glazed: true);
+            Hlp.TeachingRoom(architecture, roofs, details, "3F", "302", new Hlp.R(16, 30, 21, 35.5f), "u0", "강의실", "Lecture Room", glazed: true);
+            Hlp.TeachingRoom(architecture, roofs, details, "3F", "303", new Hlp.R(16, 35.5f, 21, 40.5f), "u0", "강의실", "Lecture Room", glazed: true);
+            Hlp.TeachingRoom(architecture, roofs, details, "3F", "304", new Hlp.R(16, 40.5f, 21, 45), "u0", "강의실", "Lecture Room", glazed: true);
+            Hlp.TeachingRoom(architecture, roofs, details, "3F", "305", new Hlp.R(16, 45, 21, 49), "u0", "강의실", "Lecture Room", glazed: true);
 
             // North-West wing (316, 315, 314, 313) leaving 2.9m vestibule before SouthLift
             Hlp.TeachingRoom(architecture, roofs, details, "3F", "316", new Hlp.R(0, 46, 12.5f, 49.5f), "u1", glazed: true);
@@ -140,12 +140,9 @@ namespace EEGWheelchairSimulator.Editor
             for (int i = 0; i < 7; i++)
             {
                 string code = (306 + i).ToString();
-                bool isProject = code == "309" || code == "310" || code == "311";
-                string ko = isProject ? "프로젝트실" : "";
-                string en = isProject ? "SW Project Room" : "";
                 float u0 = 17f + i * (19f / 7f);
                 float u1 = 17f + (i + 1) * (19f / 7f);
-                Hlp.Room(architecture, roofs, "3F", code, new Hlp.R(u0, 53.2f, u1, 57.5f), "v1", ko, en, glaze: true);
+                Hlp.Room(architecture, roofs, "3F", code, new Hlp.R(u0, 53.2f, u1, 57.5f), "v1", "프로젝트실", "SW Project Room", glaze: true);
             }
 
             Hlp.MatchBasementRestrooms(basement, architecture, "3F",
