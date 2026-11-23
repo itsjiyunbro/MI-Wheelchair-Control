@@ -127,11 +127,11 @@ namespace EEGWheelchairSimulator.Editor
             Hlp.TeachingRoom(architecture, roofs, details, "3F", "304", new Hlp.R(16, 40.5f, 21, 45), "u0", "강의실", "Lecture Room", glazed: true);
             Hlp.TeachingRoom(architecture, roofs, details, "3F", "305", new Hlp.R(16, 45, 21, 49), "u0", "강의실", "Lecture Room", glazed: true);
 
-            // North-West wing (316, 315, 314, 313) leaving 2.9m vestibule before SouthLift
-            Hlp.TeachingRoom(architecture, roofs, details, "3F", "316", new Hlp.R(0, 46, 12.5f, 49.5f), "u1", glazed: true);
-            Hlp.TeachingRoom(architecture, roofs, details, "3F", "315", new Hlp.R(0, 49.5f, 12.5f, 53.0f), "u1", glazed: true);
-            Hlp.TeachingRoom(architecture, roofs, details, "3F", "314", new Hlp.R(0, 53.0f, 12.5f, 56.5f), "u1", glazed: true);
-            Hlp.Room(architecture, roofs, "3F", "313", new Hlp.R(8.4f, 59.4f, 13, 66), "v0");
+            // North-West wing (316, 315, 314 PC Labs; 313 enclosed utility/core behind solid corridor wall)
+            Hlp.TeachingRoom(architecture, roofs, details, "3F", "316", new Hlp.R(0, 46, 12.5f, 49.5f), "u1", "PC실습실", "PC Lab", glazed: true, computers: true);
+            Hlp.TeachingRoom(architecture, roofs, details, "3F", "315", new Hlp.R(0, 49.5f, 12.5f, 53.0f), "u1", "PC실습실", "PC Lab", glazed: true, computers: true);
+            Hlp.TeachingRoom(architecture, roofs, details, "3F", "314", new Hlp.R(0, 53.0f, 12.5f, 56.5f), "u1", "PC실습실", "PC Lab", glazed: true, computers: true);
+            Hlp.Room(architecture, roofs, "3F", "313", new Hlp.R(8.4f, 59.4f, 13, 66), "v0", "설비실", "Utility Room");
 
             // West Restrooms & 306..312 Project Rooms (photos 11, 12, 13)
             Hlp.Room(architecture, roofs, "3F", "WC-W-M", new Hlp.R(14, 60.5f, 20, 66), "v0", "남자 화장실", "Men");
