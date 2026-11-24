@@ -86,7 +86,7 @@ namespace EEGWheelchairSimulator.Editor
 
         static void PrepareFirstFloorConnections(GameObject first)
         {
-            // Open 1F stairwell ceilings and UpperBluebell landing back wall in the unified scene
+            // Open 1F stairwell ceilings and UpperBluebell 2F-height baffles in the unified scene
             var upperBack = first.transform.Find("Details/UpperStairBack");
             if (upperBack)
             {
@@ -99,7 +99,17 @@ namespace EEGWheelchairSimulator.Editor
                 yonsei.gameObject.SetActive(false);
                 PrefabUtility.RecordPrefabInstancePropertyModifications(yonsei.gameObject);
             }
-            foreach (string path in new[] { "Details/NorthStairwell/StairwellCeiling", "Details/NorthStairwell/HighFrontWall", "Details/SouthStairwell/StairwellCeiling" })
+            foreach (string path in new[]
+            {
+                "Details/NorthStairwell/StairwellCeiling",
+                "Details/NorthStairwell/HighFrontWall",
+                "Details/SouthStairwell/StairwellCeiling",
+                "Details/UpperStairHighReturn",
+                "Details/UpperGalleryEnd",
+                "Details/UpperStairLandingHeader",
+                "Details/UpperGalleryStub",
+                "Details/UpperBluebell/LandingSofa",
+            })
             {
                 var obj = first.transform.Find(path);
                 if (obj)
@@ -210,9 +220,10 @@ namespace EEGWheelchairSimulator.Editor
 
         static void BuildOpenSwitchback2F3F(GameObject second, GameObject third)
         {
+            // Foot at 2F Lounge (u=-8.5, v=46.8), climbing West (+v to 51.5) & returning East (-v to 46.8) at 3F (beside 305/306).
             var g = P.Group(third.transform.Find("Details"), "Open2F3FStair");
-            g.position = second.transform.TransformPoint(Hlp.At(15.5f, 51.35f));
-            g.rotation = second.transform.rotation * Quaternion.Euler(0, 180f, 0);
+            g.position = second.transform.TransformPoint(Hlp.At(-8.5f, 46.8f));
+            g.rotation = second.transform.rotation * Quaternion.Euler(0, -90f, 0);
 
             const float width = 3.50f, depth = 4.70f, start = .55f, landingDepth = .95f, mid = Hlp.StoreyRise / 2f;
             const int count = 11;
@@ -220,7 +231,7 @@ namespace EEGWheelchairSimulator.Editor
             float tread = (turn - start) / count;
             float rise = mid / count;
             float laneWidth = (width - .16f) / 2f;
-            float lowerX = (laneWidth + .16f) / 2f;
+            float lowerX = -(laneWidth + .16f) / 2f;
             float upperX = -lowerX;
 
             void Surface(string n, Vector3 pos, Vector3 size)
@@ -244,10 +255,18 @@ namespace EEGWheelchairSimulator.Editor
             var slab = Hlp.Box(g, "ReturnSupport", (sb + st) / 2f, new Vector3(laneWidth, .14f, Vector3.Distance(sb, st)), Hlp.stairTile);
             slab.localRotation = Quaternion.LookRotation(st - sb);
             Surface("UpperLanding", new Vector3(upperX, Hlp.StoreyRise - .09f, start / 2f), new Vector3(laneWidth, .18f, start));
+            Surface("LowerApproach", new Vector3(lowerX, -.09f, start / 2f), new Vector3(laneWidth, .18f, start));
 
-            // Wheelchair safety guard along 2F bottom & 3F top opening
-            var guard2F = Hlp.Box(g, "WheelchairGuard2F", new Vector3(0, .55f, .10f), new Vector3(width, 1.10f, .06f), Hlp.white, true);
+            // Enclose 2F stair sides below 3F slab (y=0..4.42m); 3F opening gets VoidGuard + StairMouthGuard
+            float shaftH = Hlp.StoreyRise - .08f;
+            Hlp.Box(g, "StairWallNorth", new Vector3(width / 2f + .06f, shaftH / 2f, depth / 2f), new Vector3(.12f, shaftH, depth), Hlp.white, true);
+            Hlp.Box(g, "StairWallSouth", new Vector3(-width / 2f - .06f, shaftH / 2f, depth / 2f), new Vector3(.12f, shaftH, depth), Hlp.white, true);
+            Hlp.Box(g, "StairWallWest", new Vector3(0, shaftH / 2f, depth + .06f), new Vector3(width + .24f, shaftH, .12f), Hlp.white, true);
+            var guard2F = Hlp.Box(g, "WheelchairGuard2F", new Vector3(0, .55f, .08f), new Vector3(width + .2f, 1.10f, .12f), Hlp.white, true);
             guard2F.GetComponent<Renderer>().enabled = false;
+            var guard3F = Hlp.Box(g, "WheelchairGuard3F", new Vector3(0, Hlp.StoreyRise + .55f, .08f), new Vector3(width + .2f, 1.10f, .12f), Hlp.white, true);
+            guard3F.GetComponent<Renderer>().enabled = false;
+
             Hlp.AddStairRail(g, new Vector3(lowerX - laneWidth / 2f + .05f, 0, start), new Vector3(lowerX - laneWidth / 2f + .05f, mid, turn));
             Hlp.AddStairRail(g, new Vector3(lowerX + laneWidth / 2f - .05f, 0, start), new Vector3(lowerX + laneWidth / 2f - .05f, mid, turn));
             Hlp.AddStairRail(g, new Vector3(upperX - laneWidth / 2f + .05f, mid, turn), new Vector3(upperX - laneWidth / 2f + .05f, Hlp.StoreyRise, 0));
@@ -326,8 +345,8 @@ namespace EEGWheelchairSimulator.Editor
 
             Vector3 b1Spawn = ConvergenceHallB1Setup.Plan(745, 830, .5f);
             Vector3 f1Spawn = firstOrigin + Hlp.At(17, 27, .5f);
-            Vector3 f2Spawn = firstOrigin + Vector3.up * Hlp.StoreyRise + Hlp.At(19.5f, 27f, .5f);
-            Vector3 f3Spawn = firstOrigin + Vector3.up * (Hlp.StoreyRise * 2f) + Hlp.At(14.2f, 27f, .5f);
+            Vector3 f2Spawn = firstOrigin + Vector3.up * Hlp.StoreyRise + Hlp.At(1.8f, 27f, .5f);
+            Vector3 f3Spawn = firstOrigin + Vector3.up * (Hlp.StoreyRise * 2f) + Hlp.At(-12.25f, 22f, .5f);
             navigation.ConfigureAllFloors(sim, movement, follow, label, b1Spawn, f1Spawn, f2Spawn, f3Spawn, 0, 90, 90, 90);
         }
 

@@ -149,22 +149,28 @@ namespace EEGWheelchairSimulator.Editor
             // Sample corridor routes on 2F & 3F with wheelchair footprint
             var routes2 = new[]
             {
-                new[] { new Vector2(20.1f, 27f), new Vector2(20.1f, 47f) },   // 201 container & 209 corridor
-                new[] { new Vector2(21.4f, 49.5f), new Vector2(21.4f, 58.2f) }, // West corridor past Open2F3FStair & 204
-                new[] { new Vector2(23.5f, 54.2f), new Vector2(39f, 54.2f) },   // 205-208 graduate corridor
-                new[] { new Vector2(21f, 2f), new Vector2(21f, 26f) },        // East corridor 210/212-214
+                new[] { new Vector2(1.8f, 15.0f), new Vector2(1.8f, 57.8f) },    // 211 -> UpperBluebell -> 209/201 -> West corridor
+                new[] { new Vector2(1.8f, 27.2f), new Vector2(15.5f, 27.2f) },   // North-South lobby past EastLift & EastStair
+                new[] { new Vector2(3.5f, 13.0f), new Vector2(18.0f, 13.0f) },   // 211 South past 215/217 to 216
+                new[] { new Vector2(-12.5f, 41.5f), new Vector2(-1.0f, 41.5f) }, // 204 Courtyard Exit <-> 201 T-junction
+                new[] { new Vector2(-22.0f, 57.8f), new Vector2(6.0f, 57.8f) },  // Graduate 208..205 -> 전기실 -> 203-1 -> WestLift
+                new[] { new Vector2(10.0f, 55.2f), new Vector2(16.0f, 55.2f) },  // 202 <-> 203 alcove
             };
             CheckRoutes(f2.transform, routes2, guard, "2F");
 
             var routes3 = new[]
             {
-                new[] { new Vector2(14.2f, 26.8f), new Vector2(14.2f, 58.2f) }, // Main 3F corridor
-                new[] { new Vector2(7.0f, 27.0f), new Vector2(14.2f, 27.0f) },  // EastLift/Stair lobby cross-corridor
-                new[] { new Vector2(7.0f, 16.5f), new Vector2(7.0f, 27.0f) },   // North of EastLift to 319-322 Brick Portal
-                new[] { new Vector2(18f, 59f), new Vector2(34.5f, 59f) },       // 306-312 corridor
-                new[] { new Vector2(7.5f, 2f), new Vector2(7.5f, 17f) },        // 319-322 East corridor
+                new[] { new Vector2(-12.25f, 18.0f), new Vector2(-12.25f, 54.25f) }, // Main 318/301-305 corridor
+                new[] { new Vector2(-12.5f, 1.5f), new Vector2(-12.5f, 17.0f) },     // 319-322 Brick Portal corridor
+                new[] { new Vector2(-12.25f, 22.0f), new Vector2(0.0f, 22.0f) },     // Brick Portal South into East Lobby
+                new[] { new Vector2(0.0f, 22.0f), new Vector2(2.0f, 27.25f) },       // Across open East Lobby
+                new[] { new Vector2(2.0f, 27.25f), new Vector2(16.5f, 27.25f) },     // East Lobby past EastLift & EastStair
+                new[] { new Vector2(-14.0f, 54.25f), new Vector2(14.5f, 54.25f) },   // West corridor 316..WC-W-W & 306..312
             };
             CheckRoutes(f3.transform, routes3, guard, "3F");
+
+            // Verify exterior exits & locked 212/215 doors cannot be opened and block the wheelchair, and stairs/walls block penetration
+            ValidateContainmentAndWallSeals(f2, f3, guard);
 
             // Verify all doors on 2F & 3F open/close at 30/120fps and stay isolated per floor
             foreach (var floor in new[] { f2, f3 })
@@ -215,6 +221,58 @@ namespace EEGWheelchairSimulator.Editor
                     Require(m && !m.IsKeywordEnabled("_EMISSION"), $"{tag} missing/emissive material on {r.name}");
             Require(floor.GetComponentsInChildren<Light>().Length == 0, $"{tag} unexpected decorative lights");
             Debug.Log($"{tag}_GEOMETRY_OK: {expectedRooms.Length} rooms verified.");
+        }
+
+        static void ValidateContainmentAndWallSeals(GameObject f2, GameObject f3, WheelchairCollisionGuard guard)
+        {
+            foreach (var door in f2.GetComponentsInChildren<InteractiveDoor>().Concat(f3.GetComponentsInChildren<InteractiveDoor>()))
+            {
+                string label = door.Label ?? "";
+                Require(!label.Contains("EXIT") && !label.Contains("비상구") && !label.Contains("출입구") && !label.Contains("212") && !label.Contains("215"),
+                    "Exterior exit or locked RC entrance must not be openable: " + label);
+            }
+
+            // Locked exits & stairs must physically block the wheelchair footprint
+            var blockers2F = new[]
+            {
+                new Vector2(-14.0f, 41.5f), // CourtyardGlassExit
+                new Vector2(  1.0f,  0.0f), // East210Exit
+                new Vector2( 20.5f, 14.95f),// SouthEast216Exit
+                new Vector2( 19.0f, 27.25f),// SouthBluebellExit
+                new Vector2(  3.6f, 31.8f), // UpperBluebell stair mouth guard
+                new Vector2( 13.0f, 34.8f), // Void2F V0 wall/guard
+                new Vector2(  7.2f, 41.0f), // Void2F U0 container/guard
+                new Vector2( -8.5f, 46.88f),// Open2F3FStair 2F lower mouth guard
+                new Vector2(  4.5f, 11.5f), // 212 locked entrance
+                new Vector2( 11.0f, 11.5f), // 215 locked double glass entrance
+            };
+            foreach (var p in blockers2F)
+                Require(!guard.CanOccupy(Hlp.World(f2.transform, p.x, p.y, .5f), Quaternion.identity),
+                    $"2F barrier leaked wheelchair at (u={p.x}, v={p.y})");
+
+            var blockers3F = new[]
+            {
+                new Vector2(-15.5f, 52.5f), // NorthWestTerraceExit
+                new Vector2(-14.0f, 44.0f), // VoidTerraceGlazing
+                new Vector2(-15.5f, 18.5f), // EastMainCorridorExit
+                new Vector2( 18.5f, 23.7f), // EastLiftSouthExit
+                new Vector2( 16.0f, 55.7f), // SouthWestCorridorExit
+                new Vector2(  6.0f, 29.0f), // EastLobbyCourtyardGlass
+                new Vector2( -8.5f, 46.88f),// Open2F3FStair 3F upper mouth guard
+                new Vector2( -8.5f, 51.5f), // Open2F3FStair 3F V1 VoidGuard
+            };
+            foreach (var p in blockers3F)
+                Require(!guard.CanOccupy(Hlp.World(f3.transform, p.x, p.y, .5f), Quaternion.identity),
+                    $"3F barrier leaked wheelchair at (u={p.x}, v={p.y})");
+
+            // Check SouthElevatorHall corner recess seal (no gap inside WestLift lobby on 2F & 3F)
+            foreach (var floor in new[] { f2, f3 })
+            {
+                var hall = floor.transform.Find("RoomsAndCores/SouthElevatorHall");
+                var cornerWall = hall.Find("WestLiftCornerWall");
+                Require(cornerWall && cornerWall.GetComponent<BoxCollider>(), floor.name + " missing WestLiftCornerWall collider");
+            }
+            Debug.Log("CONTAINMENT_SEALS_OK: all exterior exits locked, stairs guarded, WestLift corners sealed, and 212/215 wing inaccessible.");
         }
 
         static void CheckRoutes(Transform floor, Vector2[][] routes, WheelchairCollisionGuard guard, string tag)
@@ -338,14 +396,16 @@ namespace EEGWheelchairSimulator.Editor
 
             var shots = new (Transform floor, Vector3 eye, Vector3 look, string file)[]
             {
-                (f2.transform, new Vector3(20.1f, 47.5f, 1.6f), new Vector3(19.5f, 32.0f, 1.4f), "2F_201Containers.png"),
-                (f2.transform, new Vector3(11.5f, 28.0f, 1.6f), new Vector3(11.5f, 20.0f, 1.4f), "2F_NorthLiftAndStair.png"),
-                (f2.transform, new Vector3(6.5f, 54.0f, 1.6f), new Vector3(6.5f, 64.0f, 1.4f), "2F_WestLiftHall.png"),
-                (f2.transform, new Vector3(24.0f, 42.0f, 1.6f), new Vector3(31.0f, 53.0f, 1.3f), "2F_Lounge204And206.png"),
-                (f3.transform, new Vector3(14.2f, 20.0f, 1.6f), new Vector3(14.2f, 45.0f, 1.4f), "3F_MainLobbyAndOpenStair.png"),
-                (f3.transform, new Vector3(22.0f, 59.0f, 1.6f), new Vector3(31.0f, 57.5f, 1.4f), "3F_309Corridor.png"),
-                (f3.transform, new Vector3(6.2f, 55.0f, 1.6f), new Vector3(6.2f, 64.0f, 1.4f), "3F_WestLiftAndStair.png"),
-                (f3.transform, new Vector3(15.0f, 23.0f, 1.6f), new Vector3(10.0f, 15.0f, 1.4f), "3F_319BrickPortalAndVending.png"),
+                (f2.transform, new Vector3(1.8f, 48.0f, 1.6f), new Vector3(3.0f, 34.0f, 1.4f), "2F_201Containers.png"),
+                (f2.transform, new Vector3(10.5f, 27.5f, 1.6f), new Vector3(10.5f, 19.5f, 1.4f), "2F_NorthLiftAndStair.png"),
+                (f2.transform, new Vector3(6.0f, 56.5f, 1.6f), new Vector3(6.0f, 64.5f, 1.4f), "2F_WestLiftHall.png"),
+                (f2.transform, new Vector3(11.0f, 18.0f, 1.6f), new Vector3(11.0f, 11.5f, 1.4f), "2F_211LoungeAnd212Locked.png"),
+                (f2.transform, new Vector3(-11.5f, 41.5f, 1.6f), new Vector3(-9.0f, 49.0f, 1.4f), "2F_Lounge204AndOpenStair.png"),
+                (f3.transform, new Vector3(-12.25f, 22.0f, 1.6f), new Vector3(-12.25f, 46.0f, 1.4f), "3F_MainLobbyAnd318.png"),
+                (f3.transform, new Vector3(-8.5f, 53.5f, 1.6f), new Vector3(6.0f, 53.5f, 1.4f), "3F_306To312Corridor.png"),
+                (f3.transform, new Vector3(6.0f, 56.5f, 1.6f), new Vector3(6.0f, 64.5f, 1.4f), "3F_WestLiftAndStair.png"),
+                (f3.transform, new Vector3(-12.0f, 22.5f, 1.6f), new Vector3(-12.0f, 14.0f, 1.4f), "3F_319BrickPortalAndVending.png"),
+                (f3.transform, new Vector3(2.0f, 27.2f, 1.6f), new Vector3(13.0f, 22.5f, 1.4f), "3F_EastLiftLobby.png"),
             };
 
             foreach (var (floor, eye, look, file) in shots)
@@ -356,14 +416,14 @@ namespace EEGWheelchairSimulator.Editor
                 Capture(cam, Path.Combine(dir, file));
             }
 
-            // Top-down orthographic plan overviews (hide ceilings temporarily)
+            // Top-down orthographic plan overviews centered over [-24..22] x [0..66]
             foreach (var (floor, name) in new[] { (f2, "2F_PlanOverview.png"), (f3, "3F_PlanOverview.png") })
             {
                 var ceil = floor.transform.Find("Ceilings");
                 ceil.gameObject.SetActive(false);
                 cam.orthographic = true;
-                cam.orthographicSize = 37;
-                cam.transform.position = Hlp.World(floor.transform, 19f, 33f, 75f);
+                cam.orthographicSize = 38;
+                cam.transform.position = Hlp.World(floor.transform, -2f, 33f, 75f);
                 cam.transform.rotation = Quaternion.LookRotation(Vector3.down, Vector3.right);
                 for (int i = 0; i < 4; i++) yield return null;
                 Capture(cam, Path.Combine(dir, name));
