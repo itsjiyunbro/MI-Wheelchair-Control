@@ -135,12 +135,15 @@ namespace EEGWheelchairSimulator.Editor
 
             var routes2 = new[]
             {
-                new[] { new Vector2(20.1f, 27f), new Vector2(20.1f, 47f) },
-                new[] { new Vector2(21.4f, 49.5f), new Vector2(21.4f, 58.2f) },
-                new[] { new Vector2(23.5f, 54.2f), new Vector2(39f, 54.2f) },
-                new[] { new Vector2(21f, 2f), new Vector2(21f, 26f) },
+                new[] { new Vector2(1.8f, 15.0f), new Vector2(1.8f, 57.8f) },
+                new[] { new Vector2(1.8f, 27.2f), new Vector2(15.5f, 27.2f) },
+                new[] { new Vector2(3.5f, 13.0f), new Vector2(18.0f, 13.0f) },
+                new[] { new Vector2(-12.5f, 41.5f), new Vector2(-1.0f, 41.5f) },
+                new[] { new Vector2(-22.0f, 57.8f), new Vector2(6.0f, 57.8f) },
+                new[] { new Vector2(10.0f, 55.2f), new Vector2(16.0f, 55.2f) },
             };
             CheckRoutes(f2.transform, routes2, guard, "2F");
+            Validate2FContainment(f2, guard);
 
             foreach (var door in f2.GetComponentsInChildren<InteractiveDoor>())
             {
@@ -164,6 +167,35 @@ namespace EEGWheelchairSimulator.Editor
 
             sim.ResetSimulation();
             Debug.Log("SECOND_FLOOR_VALIDATION_OK: 2F geometry, corridor clearance, 3-floor elevators (B1<->1F<->2F), and 1F<->2F stairs passed.");
+        }
+
+        static void Validate2FContainment(GameObject f2, WheelchairCollisionGuard guard)
+        {
+            foreach (var door in f2.GetComponentsInChildren<InteractiveDoor>())
+            {
+                string label = door.Label ?? "";
+                Require(!label.Contains("EXIT") && !label.Contains("비상구") && !label.Contains("출입구") && !label.Contains("212") && !label.Contains("215"),
+                    "Exterior exit or locked RC entrance must not be openable: " + label);
+            }
+            var blockers2F = new[]
+            {
+                new Vector2(-14.0f, 41.5f),
+                new Vector2(  1.0f,  0.0f),
+                new Vector2( 20.5f, 14.95f),
+                new Vector2( 19.0f, 27.25f),
+                new Vector2(  3.6f, 31.8f),
+                new Vector2( 13.0f, 34.8f),
+                new Vector2(  7.2f, 41.0f),
+                new Vector2(  4.5f, 11.5f),
+                new Vector2( 11.0f, 11.5f),
+            };
+            foreach (var p in blockers2F)
+                Require(!guard.CanOccupy(Hlp.World(f2.transform, p.x, p.y, .5f), Quaternion.identity),
+                    $"2F barrier leaked wheelchair at (u={p.x}, v={p.y})");
+            var hall = f2.transform.Find("RoomsAndCores/SouthElevatorHall");
+            var cornerWall = hall.Find("WestLiftCornerWall");
+            Require(cornerWall && cornerWall.GetComponent<BoxCollider>(), "2F missing WestLiftCornerWall collider");
+            Debug.Log("SECOND_FLOOR_CONTAINMENT_OK: exterior exits locked, stairs/voids guarded, WestLift corner sealed.");
         }
 
         static void ValidateFloorGeometry(GameObject floor, string[] expectedRooms, string tag)

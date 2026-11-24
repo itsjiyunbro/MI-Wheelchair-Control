@@ -134,7 +134,7 @@ namespace EEGWheelchairSimulator.Editor
                 Box(g, name + "GlassHigh", new Vector3(mid, 2.60f, .062f), new Vector3(w, .49f, .020f), glass);
                 var barrier = g.gameObject.AddComponent<BoxCollider>();
                 barrier.center = new Vector3(mid, H / 2, .065f);
-                barrier.size = new Vector3(w, H, .04f);
+                barrier.size = new Vector3(w, H, .13f);
                 g.gameObject.layer = obstacle;
                 int count = Mathf.Max(1, Mathf.CeilToInt(w / 1.05f));
                 for (int i = 0; i <= count; i++)
@@ -167,13 +167,13 @@ namespace EEGWheelchairSimulator.Editor
             Box(g, "CardReader", new Vector3(x, 1.15f, -.043f), new Vector3(.075f, .13f, .04f), black);
         }
 
-        public static InteractiveDoor Door(Transform p, string floorTag, string code, string korean, string english, float width, bool clear = false, bool glazedWall = false, bool addPlaque = true, float initial = 0f, bool auto = false)
+        public static InteractiveDoor Door(Transform p, string floorTag, string code, string korean, string english, float width, bool clear = false, bool glazedWall = false, bool addPlaque = true, float initial = 0f, bool auto = false, bool locked = false)
         {
             const float dh = 2.30f;
             float leafWidth = width > 1.3f ? width / 2 : width;
             for (int side = -1; side <= 1; side += 2)
-                Box(p, "Jamb" + side, new Vector3(side * (width / 2 + .025f), dh / 2, 0), new Vector3(.05f, dh, .13f), clear ? black : white);
-            Box(p, "Header", new Vector3(0, dh + .028f, 0), new Vector3(width + .10f, .056f, .13f), clear ? black : white);
+                Box(p, "Jamb" + side, new Vector3(side * (width / 2 + .025f), dh / 2, .032f), new Vector3(.05f, dh, .13f), clear ? black : white, true);
+            Box(p, "Header", new Vector3(0, dh + .028f, .032f), new Vector3(width + .10f, .056f, .13f), clear ? black : white, true);
             Box(p, "OpaqueTransom", new Vector3(0, (dh + .06f + H) / 2, .06f), new Vector3(width + .10f, H - dh - .06f, .12f), white, true);
             var motions = new List<InteractiveDoor.Motion>();
             var colliders = new List<BoxCollider>();
@@ -198,8 +198,8 @@ namespace EEGWheelchairSimulator.Editor
                 foreach (float y in new[] { .22f, 1.20f, 2.10f })
                     P.Cylinder(leaf, "Hinge" + y, new Vector3((i == 0 ? -1 : 1) * leafWidth / 2, y, -.018f), new Vector3(.022f, .065f, .022f), silver, Quaternion.identity);
                 var c = leaf.gameObject.AddComponent<BoxCollider>();
-                c.center = new Vector3(0, dh / 2, .025f);
-                c.size = new Vector3(leafWidth, dh, .055f);
+                c.center = new Vector3(0, dh / 2, .045f);
+                c.size = new Vector3(leafWidth, dh, .11f);
                 leaf.gameObject.layer = obstacle;
                 colliders.Add(c);
                 motions.Add(new InteractiveDoor.Motion
@@ -211,15 +211,19 @@ namespace EEGWheelchairSimulator.Editor
                     angle = i == 0 ? -95 : 95
                 });
             }
-            var door = p.gameObject.AddComponent<InteractiveDoor>();
-            string doorTitle = string.IsNullOrEmpty(korean) ? $"{floorTag} {code}" : $"{floorTag} {code} {korean}";
-            door.Configure(doorTitle, motions.ToArray(), colliders.ToArray(), new Vector3(0, 1.1f, -.1f), auto: auto, initial: initial);
+            InteractiveDoor door = null;
+            if (!locked)
+            {
+                door = p.gameObject.AddComponent<InteractiveDoor>();
+                string doorTitle = string.IsNullOrEmpty(korean) ? $"{floorTag} {code}" : $"{floorTag} {code} {korean}";
+                door.Configure(doorTitle, motions.ToArray(), colliders.ToArray(), new Vector3(0, 1.1f, -.1f), auto: auto, initial: initial);
+            }
             if (addPlaque && !string.IsNullOrEmpty(code)) Plaque(p, code, korean, english, -width / 2 - .17f, glazedWall);
             return door;
         }
 
         public static void Wall(Transform parent, string name, Vector3 at, float yaw, float length, string floorTag = "2F",
-            string code = null, string korean = "", string english = "", bool glazed = false, float doorOffset = 0, bool doubleDoor = false, Material solid = null, bool clearDoor = false)
+            string code = null, string korean = "", string english = "", bool glazed = false, float doorOffset = 0, bool doubleDoor = false, Material solid = null, bool clearDoor = false, bool locked = false)
         {
             var f = Face(parent, name, at, yaw);
             if (code == null) { Panel(f, "Wall", -length / 2, length / 2, glazed, solid); return; }
@@ -228,7 +232,28 @@ namespace EEGWheelchairSimulator.Editor
             Panel(f, "Right", doorOffset + half, length / 2, glazed, solid);
             var d = P.Group(f, "Door_" + code);
             d.localPosition = new Vector3(doorOffset, 0, 0);
-            Door(d, floorTag, code, korean, english, w, clearDoor, glazedWall: glazed);
+            Door(d, floorTag, code, korean, english, w, clearDoor, glazedWall: glazed, addPlaque: true, locked: locked);
+        }
+
+        public static void LockedExitFacade(Transform parent, string name, Vector3 at, float yaw, float length, string floorTag, string subtitle = "비상구")
+        {
+            var f = Face(parent, name, at, yaw);
+            float w = Mathf.Min(1.7f, Mathf.Max(.9f, length - .3f));
+            float half = w / 2 + .05f;
+            Panel(f, "Left", -length / 2, -half, true);
+            Panel(f, "Right", half, length / 2, true);
+            var d = P.Group(f, "LockedExitDoor");
+            Door(d, floorTag, "EXIT", subtitle, "Exit", w, clear: true, glazedWall: true, addPlaque: false, locked: true);
+            ExitSign(d, new Vector3(0, 2.65f, -.035f));
+        }
+
+        public static void StairMouthGuard(Transform details, string name, Vector3 pos, float yaw, float width)
+        {
+            var g = Face(details, name, pos, yaw);
+            var c = g.gameObject.AddComponent<BoxCollider>();
+            c.center = new Vector3(0, .55f, 0);
+            c.size = new Vector3(width, 1.10f, .16f);
+            g.gameObject.layer = obstacle;
         }
 
         public static Transform Room(Transform architecture, Transform roofs, string floorTag, string code, R r, string edge,
@@ -508,8 +533,14 @@ namespace EEGWheelchairSimulator.Editor
                 hall.Find(name).gameObject.SetActive(false);
                 hall.Find(name + "Collision").gameObject.SetActive(false);
             }
-            foreach (int side in new[] { -1, 1 })
-                Box(hall, "FrontCorner" + side, new Vector3(side * 2.10f, H / 2, .06f), new Vector3(.12f, H, .12f), finish, true);
+            var sideWall = hall.Find("CoreLeftWall");
+            var insetWall = hall.Find("LeftWallElevator/RecessedWallSurround/LeftWall");
+            float left = sideWall.localPosition.x - sideWall.localScale.x / 2;
+            var insetEdge = hall.InverseTransformPoint(insetWall.TransformPoint(new Vector3(-.5f, 0, -.5f)));
+            float right = insetEdge.x;
+            float depth = Mathf.Max(.12f, insetEdge.z + .012f);
+            Box(hall, "WestLiftCornerWall", new Vector3((left + right) / 2, H / 2, depth / 2), new Vector3(right - left, H, depth), finish, true);
+            Box(hall, "CornerSkirting", new Vector3((left + right) / 2, .0425f, -.006f), new Vector3(right - left, .085f, .012f), black);
         }
 
         public static void BuildNorthStairwellShell(Transform details, string floorTag, R r, bool withCeiling = true)

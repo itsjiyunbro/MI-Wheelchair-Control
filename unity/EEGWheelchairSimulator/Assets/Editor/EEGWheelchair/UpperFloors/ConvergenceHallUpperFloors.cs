@@ -88,7 +88,17 @@ namespace EEGWheelchairSimulator.Editor
                 yonsei.gameObject.SetActive(false);
                 PrefabUtility.RecordPrefabInstancePropertyModifications(yonsei.gameObject);
             }
-            foreach (string path in new[] { "Details/NorthStairwell/StairwellCeiling", "Details/NorthStairwell/HighFrontWall", "Details/SouthStairwell/StairwellCeiling" })
+            foreach (string path in new[]
+            {
+                "Details/NorthStairwell/StairwellCeiling",
+                "Details/NorthStairwell/HighFrontWall",
+                "Details/SouthStairwell/StairwellCeiling",
+                "Details/UpperStairHighReturn",
+                "Details/UpperGalleryEnd",
+                "Details/UpperStairLandingHeader",
+                "Details/UpperGalleryStub",
+                "Details/UpperBluebell/LandingSofa",
+            })
             {
                 var obj = first.transform.Find(path);
                 if (obj)
@@ -243,7 +253,7 @@ namespace EEGWheelchairSimulator.Editor
 
             Vector3 b1Spawn = ConvergenceHallB1Setup.Plan(745, 830, .5f);
             Vector3 f1Spawn = firstOrigin + Hlp.At(17, 27, .5f);
-            Vector3 f2Spawn = firstOrigin + Vector3.up * Hlp.StoreyRise + Hlp.At(19.5f, 27f, .5f);
+            Vector3 f2Spawn = firstOrigin + Vector3.up * Hlp.StoreyRise + Hlp.At(1.8f, 27f, .5f);
             navigation.ConfigureUpToSecondFloor(sim, movement, follow, label, b1Spawn, f1Spawn, f2Spawn, 0, 90, 90);
         }
 
