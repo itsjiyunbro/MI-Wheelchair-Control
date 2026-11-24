@@ -134,7 +134,7 @@ namespace EEGWheelchairSimulator.Editor
             var r212 = Hlp.Room(architecture, roofs, "2F", "212", new Hlp.R(2.0f, 7.5f, 7.0f, 11.5f), "v1", "RC융합대학", "RC Convergence College");
             UnityEngine.Object.DestroyImmediate(r212.Find("V1/Door_212").GetComponent<InteractiveDoor>());
 
-            var r215 = Hlp.Room(architecture, roofs, "2F", "215", new Hlp.R(7.0f, 0.0f, 15.0f, 11.5f), "v1", "회의실 로비", "Conference Lobby", glaze: true, doubles: true, clearDoor: true);
+            var r215 = Hlp.Room(architecture, roofs, "2F", "215", new Hlp.R(7.0f, 0.0f, 15.0f, 11.5f), "v1", "RC라운지", "RC Lounge", glaze: true, doubles: true, clearDoor: true);
             UnityEngine.Object.DestroyImmediate(r215.Find("V1/Door_215").GetComponent<InteractiveDoor>());
 
             Hlp.TeachingRoom(architecture, roofs, details, "2F", "219", new Hlp.R(15.0f, 0.0f, 20.5f, 3.7f), "u0");
@@ -142,7 +142,7 @@ namespace EEGWheelchairSimulator.Editor
             Hlp.TeachingRoom(architecture, roofs, details, "2F", "217", new Hlp.R(15.0f, 7.5f, 20.5f, 11.5f), "u0");
 
             Hlp.Room(architecture, roofs, "2F", "216", new Hlp.R(17.0f, 18.4f, 20.5f, 25.5f), "v0", "서버실", "Server Room");
-            Hlp.Room(architecture, roofs, "2F", "210", new Hlp.R(-5.5f, 0.0f, 0.0f, 6.5f), "u1", "서버실", "Server Room");
+            Hlp.Room(architecture, roofs, "2F", "210", new Hlp.R(-5.5f, 0.0f, 0.0f, 6.5f), "u1", "관리실", "Management Office");
             Hlp.Room(architecture, roofs, "2F", "WC-E-M", new Hlp.R(-5.5f, 6.5f, 0.0f, 11.5f), "u1", "남자 화장실", "Men");
             Hlp.Room(architecture, roofs, "2F", "WC-E-W", new Hlp.R(-5.5f, 11.5f, 0.0f, 16.5f), "u1", "여자 화장실", "Women");
 
